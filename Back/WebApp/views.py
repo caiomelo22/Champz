@@ -563,7 +563,7 @@ class GenerateFinalView(APIView):
 
 
 class TransfersView(APIView):
-    def post(self, request):
+    def get(self, request):
         file = open("transfers.txt", "w")
         leagues = League.objects.all().order_by('name')
         team_participant = None

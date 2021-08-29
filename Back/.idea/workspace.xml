@@ -2,28 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="361dbb1e-1d07-4649-873f-869faba78442" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApp/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/WebApp/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/WebApp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/champz.txt" beforeDir="false" afterPath="$PROJECT_DIR$/champz.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Front/src/components/base/MaterialAlert.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Front/src/components/base/MaterialCard.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Front/src/components/base/MaterialChartCard.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Front/src/components/base/MaterialDropdown.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Front/src/components/base/MaterialSnackbar.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Front/src/components/base/MaterialStatsCard.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Front/src/components/base/MaterialTabs.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Front/src/components/base/MaterialTestimony.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Front/src/components/base/MaterialWizard.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Front/src/components/base/Subheading.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Front/src/components/base/VComponent.vue" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Front/src/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/../Front/src/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Front/src/router.js" beforeDir="false" afterPath="$PROJECT_DIR$/../Front/src/router.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Front/src/sass/variables.scss" beforeDir="false" afterPath="$PROJECT_DIR$/../Front/src/sass/variables.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Front/src/views/dashboard/matches/Matches.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../Front/src/views/dashboard/matches/Matches.vue" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -71,7 +52,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>

@@ -1,0 +1,207 @@
+TEAMS: 
+
+TEAM CAIO(CHELSEA)
+	Virgil van Dijk - 90 - $90
+	Robert Lewandowski - 89 - $27
+	Sadio Mané - 88 - $45
+	Keylor Navas - 87 - $9
+	Milan Škriniar - 86 - $9
+	Jadon Sancho - 84 - $6
+	Memphis Depay - 84 - $17
+	Georginio Wijnaldum - 84 - $8
+	Julian Brandt - 84 - $6
+	Wilfred Ndidi - 84 - $4
+	Anthony Martial - 83 - $4
+	Thomas Delaney - 82 - $4
+	Nélson Semedo - 82 - $9
+	Quincy Promes - 82 - $4
+	Aaron Wan-Bissaka - 79 - $4
+
+TEAM DUDU(NEWCASTLE UNITED)
+	Mohamed Salah - 90 - $31
+	Alisson - 89 - $18
+	Harry Kane - 89 - $15
+	Kalidou Koulibaly - 89 - $30
+	Paulo Dybala - 88 - $22
+	Diego Godín - 88 - $17
+	Thiago - 87 - $7
+	Timo Werner - 86 - $35
+	Fabinho - 85 - $8
+	Alejandro Gómez - 85 - $9
+	João Cancelo - 84 - $16
+	Sokratis - 84 - $4
+	Alex Telles - 84 - $9
+	Serge Gnabry - 84 - $5
+	Felipe Anderson - 84 - $9
+
+TEAM BISIG(ASTON VILLA)
+	De Gea - 89 - $18
+	Sergio Agüero - 89 - $54
+	Luis Suárez - 89 - $20
+	Sergio Ramos - 89 - $50
+	Paul Pogba - 88 - $25
+	Raheem Sterling - 88 - $28
+	Fernandinho - 87 - $7
+	Jordi Alba - 87 - $13
+	Matthijs de Ligt - 85 - $7
+	Azpilicueta - 84 - $4
+	Douglas Costa - 84 - $20
+	Odriozola - 80 - $4
+
+TEAM GUIDO(MANCHESTER CITY)
+	Marc-André ter Stegen - 90 - $20
+	Giorgio Chiellini - 89 - $21
+	Ederson - 88 - $10
+	Aubameyang - 88 - $37
+	Toni Kroos - 88 - $9
+	Christian Eriksen - 88 - $5
+	Leroy Sané - 86 - $28
+	Roberto Firmino - 86 - $18
+	Alexandre Lacazette - 86 - $17
+	Kostas Manolas - 85 - $28
+	Riyad Mahrez - 84 - $4
+	Nicolas Pépé - 83 - $4
+	Achraf Hakimi - 82 - $10
+	Éder Militão - 81 - $10
+	Kevin Mbabu - 77 - $4
+
+TEAM GRILLO(WEST HAM UNITED)
+	Kylian Mbappé - 89 - $50
+	Antoine Griezmann - 89 - $30
+	Marco Reus - 88 - $17
+	Hugo Lloris - 88 - $15
+	Bernardo Silva - 87 - $11
+	Lorenzo Insigne - 87 - $8
+	Thiago Silva - 87 - $9
+	Marquinhos - 86 - $14
+	Axel Witsel - 85 - $16
+	Carvajal - 85 - $12
+	Arturo Vidal - 84 - $17
+	Kingsley Coman - 84 - $6
+	Paulinho - 84 - $17
+	Presnel Kimpembe - 82 - $8
+	Benjamin Mendy - 80 - $4
+
+TEAM MAIA(LIVERPOOL)
+	Neymar Jr - 92 - $85
+	Thibaut Courtois - 88 - $12
+	Dries Mertens - 87 - $10
+	Raphaël Varane - 85 - $45
+	Clément Lenglet - 85 - $27
+	Idrissa Gueye - 83 - $4
+	Radja Nainggolan - 83 - $11
+	Wissam Ben Yedder - 83 - $31
+	Trent Alexander-Arnold - 83 - $9
+	Jérôme Roussillon - 82 - $12
+	Moussa Sissoko - 81 - $4
+
+TEAM TROTTA(MANCHESTER UNITED)
+	Cristiano Ronaldo - 93 - $66
+	Kevin De Bruyne - 91 - $21
+	Eden Hazard - 91 - $27
+	Manuel Neuer - 88 - $19
+	Samuel Umtiti - 86 - $7
+	David Alaba - 85 - $14
+	Frenkie de Jong - 85 - $5
+	Kyle Walker - 84 - $15
+	Lucas Hernández - 84 - $17
+	Lucas - 83 - $17
+	Marcus Rashford - 83 - $17
+	Ricardo Pereira - 82 - $7
+	Ferland Mendy - 80 - $14
+	Joe Gomez - 80 - $4
+
+TEAM BAMBU(LEICESTER CITY)
+	Samir Handanovic - 88 - $17
+	Aymeric Laporte - 87 - $14
+	Toby Alderweireld - 87 - $15
+	Heung Min Son - 87 - $51
+	Joshua Kimmich - 86 - $17
+	Alex Sandro - 85 - $14
+	Blaise Matuidi - 85 - $13
+	Niklas Süle - 85 - $9
+	Allan - 85 - $10
+	Gareth Bale - 85 - $31
+	Bruno Fernandes - 85 - $10
+	Felipe - 84 - $6
+	Ousmane Dembélé - 84 - $14
+	Leon Goretzka - 84 - $11
+	Vinícius Júnior - 79 - $4
+
+TEAM BRION(NORWICH CITY)
+	Lionel Messi - 94 - $58
+	Jan Oblak - 91 - $18
+	Luka Modric - 90 - $19
+	N'Golo Kanté - 89 - $37
+	Piqué - 88 - $19
+	Mats Hummels - 87 - $17
+	Jan Vertonghen - 87 - $11
+	Casemiro - 87 - $19
+	Coutinho - 86 - $16
+	Andrew Robertson - 85 - $21
+	Marcelo - 85 - $15
+
+GROUP STAGE TABLE
+
+TEAM		P	W	D	L	GF	GA	GD
+Grillo		22	7	1	0	35	10	25
+Caio		19	6	1	1	39	11	28
+Trotta		19	6	1	1	32	18	14
+Maia		16	5	1	2	34	10	24
+Bisig		12	4	0	4	25	21	4
+Dudu		9	3	0	5	23	25	-2
+Bambu		6	2	0	6	12	33	-21
+Brion		3	1	0	7	7	36	-29
+Guido		0	0	0	8	5	48	-43
+
+MATCHES: 
+
+GROUP 1
+	Grillo 2 x 2 Caio
+	Trotta 2 x 2 Maia
+	Dudu 5 x 1 Brion
+	Bambu 1 x 2 Bisig
+	Guido 1 x 9 Grillo
+	Caio 2 x 3 Trotta
+	Maia 4 x 1 Dudu
+	Brion 0 x 2 Bambu
+	Bisig 5 x 0 Guido
+	Grillo 4 x 1 Trotta
+	Maia 5 x 0 Brion
+	Bambu 3 x 2 Guido
+	Caio 4 x 3 Dudu
+	Maia 5 x 2 Bisig
+	Bambu 0 x 8 Grillo
+	Trotta 6 x 3 Dudu
+	Brion 1 x 5 Bisig
+	Guido 0 x 11 Caio
+	Trotta 6 x 0 Brion
+	Bisig 1 x 3 Grillo
+	Guido 1 x 5 Dudu
+	Maia 7 x 1 Bambu
+	Bisig 2 x 3 Caio
+	Guido 0 x 4 Trotta
+	Brion 3 x 4 Grillo
+	Bisig 4 x 2 Dudu
+	Guido 0 x 9 Maia
+	Bambu 0 x 7 Caio
+	Bisig 4 x 6 Trotta
+	Guido 1 x 2 Brion
+	Grillo 3 x 1 Dudu
+	Trotta 4 x 3 Bambu
+	Caio 2 x 1 Maia
+	Brion 0 x 8 Caio
+	Maia 1 x 2 Grillo
+	Dudu 3 x 2 Bambu
+
+WILDCARD
+	Trotta 4 x 2 Dudu
+	Maia 5 x 2 Bisig
+
+SEMIS
+	Grillo 1 x 4 Maia
+	Caio 6 x 4 Trotta
+
+FINAL
+	Maia 1 x 3 Caio
+

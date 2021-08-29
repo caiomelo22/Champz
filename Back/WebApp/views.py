@@ -238,6 +238,21 @@ class CreateMatchesView(APIView):
 
         matches = group.createMatches()
 
+        file = open("matches.txt", "w")
+
+        file.write('MATCHES: \n\n')
+
+        strBuilder = ""
+        strBuilder += '{}\n'.format(group.group.upper())
+        for match in matches:
+            team_1 = match.team_1.participant.name
+            team_2 = match.team_2.participant.name
+            strBuilder += '\t{} {} x {} {}\n'.format(team_1, match.goals_team_1, match.goals_team_2, team_2)
+        strBuilder += '\n'
+        file.write(strBuilder)
+
+        file.close()
+
         matches = MatchSerializer(matches, many=True).data
 
         return Response(matches)
@@ -255,6 +270,28 @@ class StartGroupView(APIView):
             group.addTeam(team)
         
         matches = group.createMatches()
+
+        file = open("matches.txt", "w")
+
+        file.write('MATCHES: \n\n')
+
+        strBuilder = ""
+        strBuilder += '{}\n'.format(group.group.upper())
+        for match in matches:
+            team_1 = match.team_1.participant.name
+            team_2 = match.team_2.participant.name
+            goals_1 = match.goals_team_1
+            print(goals_1, type(goals_1))
+            if goals_1 is None:
+                goals_1 = ''
+            goals_2 = match.goals_team_2
+            if goals_2 is None:
+                goals_2 = ''
+            strBuilder += '\t{} {} x {} {}\n'.format(team_1, goals_1, goals_2, team_2)
+        strBuilder += '\n'
+        file.write(strBuilder)
+
+        file.close()
 
         matches = MatchSerializer(matches, many=True).data
 
@@ -353,7 +390,7 @@ class GenerateWildcardKnockoutRoundView(APIView):
     def post(self, request):
         groups = list(Group.objects.all())
 
-        matches = []
+        matchesWildcard = []
 
         old_stage = Group.objects.filter(group='Wildcard')
         if len(old_stage) > 0:
@@ -361,23 +398,23 @@ class GenerateWildcardKnockoutRoundView(APIView):
             old_stage.delete()
 
         if len(groups) == 1:
-            table = groups[0].getGroupTable()[2:6]
+            tableWildcard = groups[0].getGroupTable()[2:6]
             wildcard = Group.create('Wildcard')
 
-            for team in table:
+            for team in tableWildcard:
                 wildcard.addTeam(team[0])
 
-            matches.append(Match.create(wildcard, table[0][0], table[3][0]))
-            matches.append(Match.create(wildcard, table[1][0], table[2][0]))
+            matchesWildcard.append(Match.create(wildcard, tableWildcard[0][0], tableWildcard[3][0]))
+            matchesWildcard.append(Match.create(wildcard, tableWildcard[1][0], tableWildcard[2][0]))
 
         else:
             return HttpResponseBadRequest("Number of groups does not allow the generation of a knockout round.")
 
         wildcard.save()
 
-        matches = MatchSerializer(matches, many=True)
+        matchesWildcard = MatchSerializer(matchesWildcard, many=True)
 
-        return Response(matches.data)
+        return Response(matchesWildcard.data)
 
 
 class GenerateSemiFinalsRoundView(APIView):
@@ -388,14 +425,14 @@ class GenerateSemiFinalsRoundView(APIView):
                 return i
         return -1
 
-    def get_wildcard_winners(self, wildcards, group_stage):
+    def get_group_winners(self, group, teams, group_stage):
         qualified = []
-        wildcard_group = Group.objects.filter(group='Wildcard')
-        for team in wildcards:
+        group = Group.objects.filter(group=group)[0]
+        for team in teams:
             if team[1]['P'] == 3:
                 qualified.append(team[0])
             elif team[1]['P'] == 1:
-                opponent = wildcard_group.findMatchGroupParticipantOpponent(team[0])
+                opponent = group.findMatchGroupParticipantOpponent(team[0])
                 position_team = self.checkPositionGroupStage(team[0], group_stage)
                 position_opponent = self.checkPositionGroupStage(opponent, group_stage)
                 if position_team < position_opponent:
@@ -408,19 +445,25 @@ class GenerateSemiFinalsRoundView(APIView):
 
     def post(self, request):
         groups = list(Group.objects.all())
+        table_group_stage = groups[0].getGroupTable()
 
-        matches = []
+        matchesSemi = []
+        matchesInteriorSemi = []
 
         old_stage = Group.objects.filter(group='Semis')
         if len(old_stage) > 0:
             old_stage = old_stage[0]
             old_stage.delete()
 
+        old_stage = Group.objects.filter(group='Interior Semis')
+        if len(old_stage) > 0:
+            old_stage = old_stage[0]
+            old_stage.delete()
+
         table_wildcard = groups[1].getGroupTable()
-        table_group_stage = groups[0].getGroupTable()
         semis = Group.create('Semis')
 
-        wildcard_winners = self.get_wildcard_winners(table_wildcard, table_group_stage)
+        wildcard_winners = self.get_group_winners('Wildcard', table_wildcard, table_group_stage)
 
         semis.addTeam(table_group_stage[0][0])
         semis.addTeam(table_group_stage[1][0])
@@ -431,33 +474,92 @@ class GenerateSemiFinalsRoundView(APIView):
         wc2_position = self.checkPositionGroupStage(wildcard_winners[1], table_group_stage)
 
         if wc1_position < wc2_position:
-            matches.append(Match.create(semis, table_group_stage[0][0], wildcard_winners[1]))
-            matches.append(Match.create(semis, table_group_stage[1][0], wildcard_winners[0]))
+            matchesSemi.append(Match.create(semis, table_group_stage[0][0], wildcard_winners[1]))
+            matchesSemi.append(Match.create(semis,  wildcard_winners[1], table_group_stage[0][0]))
+            matchesSemi.append(Match.create(semis, table_group_stage[1][0], wildcard_winners[0]))
+            matchesSemi.append(Match.create(semis, wildcard_winners[0], table_group_stage[1][0]))
         else:
-            matches.append(Match.create(semis, table_group_stage[0][0], wildcard_winners[0]))
-            matches.append(Match.create(semis, table_group_stage[1][0], wildcard_winners[1]))
+            matchesSemi.append(Match.create(semis, table_group_stage[0][0], wildcard_winners[0]))
+            matchesSemi.append(Match.create(semis, wildcard_winners[0], table_group_stage[0][0]))
+            matchesSemi.append(Match.create(semis, table_group_stage[1][0], wildcard_winners[1]))
+            matchesSemi.append(Match.create(semis, wildcard_winners[1], table_group_stage[1][0]))
 
         semis.save()
 
-        matches = MatchSerializer(matches, many=True)
+        tableInterior = table_group_stage[6:]
+        interior = Group.create('Interior Semis')
 
-        return Response(matches.data)
+        for team in tableInterior:
+            interior.addTeam(team[0])
+
+        matchesInteriorSemi.append(Match.create(interior, tableInterior[0][0], tableInterior[3][0]))
+        matchesInteriorSemi.append(Match.create(interior, tableInterior[1][0], tableInterior[2][0]))
+
+        interior.save()
+
+        matchesInteriorSemi = MatchSerializer(matchesInteriorSemi, many=True)
+
+        matchesSemi = MatchSerializer(matchesSemi, many=True)
+
+        return Response(matchesSemi.data)
 
 
 class GenerateFinalView(APIView):
-    def post(self, request, id):
-        group = list(Group.objects.filter(id=id))
+    def checkPositionGroupStage(self, team, group_stage):
+        for i, position in enumerate(group_stage):
+            print(position, i)
+            if position[0] == team:
+                return i
+        return -1
+    def get_interior_winners(self, group, teams, group_stage):
+        qualified = []
+        group = Group.objects.filter(group=group)[0]
+        for team in teams:
+            if team[1]['P'] == 3:
+                qualified.append(team[0])
+            elif team[1]['P'] == 1:
+                opponent = group.findMatchGroupParticipantOpponent(team[0])
+                position_team = self.checkPositionGroupStage(team[0], group_stage)
+                position_opponent = self.checkPositionGroupStage(opponent, group_stage)
+                if position_team < position_opponent:
+                    qualified.append(team[0])
 
-        if len(group) == 0:
-            return HttpResponseNotFound("There are no groups with the given id.")
-        else:
-            group = group[0]
+            if len(qualified) == 2:
+                break
 
-        matches = group.generateFinalRound()
+        return qualified
+    def post(self, request):
+        old_stage = Group.objects.filter(group='Final')
+        if len(old_stage) > 0:
+            old_stage = old_stage[0]
+            old_stage.delete()
 
-        matches = MatchSerializer(matches, many=True)
+        old_stage = Group.objects.filter(group='Interior Final')
+        if len(old_stage) > 0:
+            old_stage = old_stage[0]
+            old_stage.delete()
 
-        return Response(matches.data)
+        groups = list(Group.objects.all())
+
+        semis = groups[-2]
+
+        finalMatch = semis.generateFinalRound()
+
+        table_group_stage = groups[0].getGroupTable()
+
+        table_interior_semis = groups[3].getGroupTable()
+        interiorFinal = Group.create('Interior Final')
+
+        interiorSemisWinners = self.get_interior_winners('Interior Semis', table_interior_semis, table_group_stage)
+
+        for team in interiorSemisWinners:
+            interiorFinal.addTeam(team)
+
+        Match.create(interiorFinal, interiorSemisWinners[0], interiorSemisWinners[1])
+
+        finalMatch = MatchSerializer(finalMatch, many=True)
+
+        return Response(finalMatch.data)
 
 
 class TransfersView(APIView):
@@ -567,14 +669,21 @@ class EndChampzView(APIView):
             for match in matches:
                 team_1 = match.team_1.participant.name
                 team_2 = match.team_2.participant.name
-                strBuilder += '\t{} {} x {} {}\n'.format(team_1, match.goals_team_1, match.goals_team_2, team_2)
+                goals_1 = match.goals_team_1
+                print(goals_1, type(goals_1))
+                if goals_1 is None:
+                    goals_1 = ''
+                goals_2 = match.goals_team_2
+                if goals_2 is None:
+                    goals_2 = ''
+                strBuilder += '\t{} {} x {} {}\n'.format(team_1, goals_1, goals_2, team_2)
             strBuilder += '\n'
             file.write(strBuilder)
 
         file.close()
 
-        for participant in participants:
-            participant.delete()
+        #for participant in participants:
+        #    participant.delete()
 
         return Response()
 

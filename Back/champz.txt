@@ -1,207 +1,234 @@
 TEAMS: 
 
-TEAM CAIO(CHELSEA)
-	Virgil van Dijk - 90 - $90
-	Robert Lewandowski - 89 - $27
-	Sadio Mané - 88 - $45
-	Keylor Navas - 87 - $9
-	Milan Škriniar - 86 - $9
-	Jadon Sancho - 84 - $6
-	Memphis Depay - 84 - $17
-	Georginio Wijnaldum - 84 - $8
-	Julian Brandt - 84 - $6
-	Wilfred Ndidi - 84 - $4
-	Anthony Martial - 83 - $4
-	Thomas Delaney - 82 - $4
-	Nélson Semedo - 82 - $9
-	Quincy Promes - 82 - $4
-	Aaron Wan-Bissaka - 79 - $4
+TEAM CAIO(ARSENAL)
+	 Robert Lewandowski  - 92 - $35
+	 Manuel Neuer  - 90 - $15
+	 Virgil van Dijk  - 90 - $60
+	 Karim Benzema  - 89 - $7
+	 N'Golo Kanté  - 88 - $40
+	 Mats Hummels  - 87 - $10
+	 Ciro Immobile  - 87 - $40
+	 Jadon Sancho  - 87 - $11
+	 Ilkay Gündogan  - 84 - $5
+	 Marco Reus  - 84 - $16
+	 Guerreiro  - 83 - $5
+	 Sergio Reguilón Rodríguez  - 82 - $5
 
-TEAM DUDU(NEWCASTLE UNITED)
-	Mohamed Salah - 90 - $31
-	Alisson - 89 - $18
-	Harry Kane - 89 - $15
-	Kalidou Koulibaly - 89 - $30
-	Paulo Dybala - 88 - $22
-	Diego Godín - 88 - $17
-	Thiago - 87 - $7
-	Timo Werner - 86 - $35
-	Fabinho - 85 - $8
-	Alejandro Gómez - 85 - $9
-	João Cancelo - 84 - $16
-	Sokratis - 84 - $4
-	Alex Telles - 84 - $9
-	Serge Gnabry - 84 - $5
-	Felipe Anderson - 84 - $9
+TEAM DUDU(ASTON VILLA)
+	 ter Stegen  - 90 - $16
+	 Kylian Mbappé  - 90 - $80
+	 Alejandro Gómez  - 86 - $20
+	 Jordan Henderson  - 86 - $10
+	 Paul Pogba  - 86 - $15
+	 Milan Škriniar  - 86 - $12
+	 Aubameyang  - 85 - $35
+	 Riyad Mahrez  - 85 - $5
+	 Ricardo Pereira  - 85 - $8
+	 Georginio Wijnaldum  - 84 - $19
+	 Jérôme Boateng  - 84 - $11
+	 Iago Aspas  - 84 - $5
+	 Lucas Hernández  - 83 - $13
 
-TEAM BISIG(ASTON VILLA)
-	De Gea - 89 - $18
-	Sergio Agüero - 89 - $54
-	Luis Suárez - 89 - $20
-	Sergio Ramos - 89 - $50
-	Paul Pogba - 88 - $25
-	Raheem Sterling - 88 - $28
-	Fernandinho - 87 - $7
-	Jordi Alba - 87 - $13
-	Matthijs de Ligt - 85 - $7
-	Azpilicueta - 84 - $4
-	Douglas Costa - 84 - $20
-	Odriozola - 80 - $4
+TEAM MAIA(BURNLEY)
+	 Neymar Jr  - 91 - $80
+	 Keylor Navas  - 89 - $15
+	 Joshua Kimmich  - 89 - $22
+	 Roberto Firmino  - 85 - $12
+	 Rúben Santos Gato Alves Dias  - 85 - $7
+	 Wissam Ben Yedder  - 84 - $20
+	 Allan Marques Loureiro  - 83 - $15
+	 Álvaro Borja Morata Martín  - 83 - $16
+	 Diego Carlos Santos Silva  - 83 - $14
+	 Marcos Acuña  - 83 - $5
+	 Presnel Kimpembe  - 83 - $13
+	 Gabriel Jesus  - 83 - $15
+	 João Félix Sequeira  - 83 - $16
 
-TEAM GUIDO(MANCHESTER CITY)
-	Marc-André ter Stegen - 90 - $20
-	Giorgio Chiellini - 89 - $21
-	Ederson - 88 - $10
-	Aubameyang - 88 - $37
-	Toni Kroos - 88 - $9
-	Christian Eriksen - 88 - $5
-	Leroy Sané - 86 - $28
-	Roberto Firmino - 86 - $18
-	Alexandre Lacazette - 86 - $17
-	Kostas Manolas - 85 - $28
-	Riyad Mahrez - 84 - $4
-	Nicolas Pépé - 83 - $4
-	Achraf Hakimi - 82 - $10
-	Éder Militão - 81 - $10
-	Kevin Mbabu - 77 - $4
+TEAM TROTTA(CHELSEA)
+	 Bruno Fernandes  - 88 - $30
+	 Wojciech Szczesny  - 87 - $5
+	 Leon Goretzka  - 87 - $25
+	 Dries Mertens  - 85 - $16
+	 João Cancelo  - 85 - $19
+	 Leroy Sané  - 85 - $14
+	 Marcus Rashford  - 85 - $30
+	 Lucas Digne  - 84 - $5
+	 Lautaro Martínez  - 84 - $25
+	 Joe Gomez  - 83 - $26
+	 Ferland Mendy  - 83 - $30
+	 Aaron Wan-Bissaka  - 83 - $18
+	 Achraf Hakimi  - 83 - $7
 
-TEAM GRILLO(WEST HAM UNITED)
-	Kylian Mbappé - 89 - $50
-	Antoine Griezmann - 89 - $30
-	Marco Reus - 88 - $17
-	Hugo Lloris - 88 - $15
-	Bernardo Silva - 87 - $11
-	Lorenzo Insigne - 87 - $8
-	Thiago Silva - 87 - $9
-	Marquinhos - 86 - $14
-	Axel Witsel - 85 - $16
-	Carvajal - 85 - $12
-	Arturo Vidal - 84 - $17
-	Kingsley Coman - 84 - $6
-	Paulinho - 84 - $17
-	Presnel Kimpembe - 82 - $8
-	Benjamin Mendy - 80 - $4
+TEAM VILLAR(CRYSTAL PALACE)
+	 Kevin De Bruyne  - 91 - $50
+	 Thibaut Courtois  - 89 - $15
+	 Kalidou Koulibaly  - 88 - $35
+	 Sergio Agüero  - 87 - $20
+	 Ángel Di María  - 87 - $15
+	 Marquinhos  - 87 - $40
+	 Eden Hazard  - 86 - $17
+	 Romelu Lukaku  - 86 - $30
+	 Marco Verratti  - 86 - $5
+	 Carvajal  - 86 - $15
+	 Alex Telles  - 83 - $7
 
-TEAM MAIA(LIVERPOOL)
-	Neymar Jr - 92 - $85
-	Thibaut Courtois - 88 - $12
-	Dries Mertens - 87 - $10
-	Raphaël Varane - 85 - $45
-	Clément Lenglet - 85 - $27
-	Idrissa Gueye - 83 - $4
-	Radja Nainggolan - 83 - $11
-	Wissam Ben Yedder - 83 - $31
-	Trent Alexander-Arnold - 83 - $9
-	Jérôme Roussillon - 82 - $12
-	Moussa Sissoko - 81 - $4
+TEAM GUIDO(EVERTON)
+	 Cristiano Ronaldo  - 92 - $120
+	 Jan Oblak  - 91 - $14
+	 Jordi Alba  - 86 - $17
+	 Lorenzo Insigne  - 85 - $12
+	 Toby Alderweireld  - 84 - $5
+	 Kyle Walker  - 84 - $30
+	 Alex Sandro  - 84 - $10
+	 Raúl Jiménez  - 84 - $5
+	 Marcel Sabitzer  - 84 - $9
+	 Wilfred Ndidi  - 84 - $5
+	 Arthur Henrique Ramos Oliveira Melo  - 84 - $5
+	 Kai Havertz  - 83 - $6
+	 Grimaldo  - 82 - $5
 
-TEAM TROTTA(MANCHESTER UNITED)
-	Cristiano Ronaldo - 93 - $66
-	Kevin De Bruyne - 91 - $21
-	Eden Hazard - 91 - $27
-	Manuel Neuer - 88 - $19
-	Samuel Umtiti - 86 - $7
-	David Alaba - 85 - $14
-	Frenkie de Jong - 85 - $5
-	Kyle Walker - 84 - $15
-	Lucas Hernández - 84 - $17
-	Lucas - 83 - $17
-	Marcus Rashford - 83 - $17
-	Ricardo Pereira - 82 - $7
-	Ferland Mendy - 80 - $14
-	Joe Gomez - 80 - $4
+TEAM JOE(LEEDS UNITED)
+	 Lionel Messi  - 93 - $55
+	 Alisson  - 89 - $16
+	 Toni Kroos  - 88 - $7
+	 Sadio Mané  - 88 - $55
+	 Paulo Dybala  - 87 - $10
+	 Aymeric Laporte  - 86 - $16
+	 Bernardo Silva  - 86 - $9
+	 Frenkie de Jong  - 86 - $35
+	 Stefan de Vrij  - 85 - $24
+	 Jesús Corona  - 83 - $5
+	 José Luís Gayà Peña  - 83 - $7
+	 Phil Foden  - 83 - $5
+	 Marcelo  - 82 - $5
 
-TEAM BAMBU(LEICESTER CITY)
-	Samir Handanovic - 88 - $17
-	Aymeric Laporte - 87 - $14
-	Toby Alderweireld - 87 - $15
-	Heung Min Son - 87 - $51
-	Joshua Kimmich - 86 - $17
-	Alex Sandro - 85 - $14
-	Blaise Matuidi - 85 - $13
-	Niklas Süle - 85 - $9
-	Allan - 85 - $10
-	Gareth Bale - 85 - $31
-	Bruno Fernandes - 85 - $10
-	Felipe - 84 - $6
-	Ousmane Dembélé - 84 - $14
-	Leon Goretzka - 84 - $11
-	Vinícius Júnior - 79 - $4
+TEAM SENNA(LEICESTER CITY)
+	 Heung Min Son  - 89 - $45
+	 Casemiro  - 89 - $20
+	 Samir Handanovic  - 87 - $13
+	 Luka Modric  - 87 - $8
+	 Jamie Vardy  - 87 - $7
+	 Kingsley Coman  - 86 - $15
+	 Trent Alexander-Arnold  - 86 - $12
+	 Raphaël Varane  - 85 - $55
+	 Matthijs de Ligt  - 85 - $16
+	 Timo Werner  - 84 - $13
+	 Marcos Llorente  - 84 - $24
+	 Yuri Berchiche Izeta  - 83 - $10
 
-TEAM BRION(NORWICH CITY)
-	Lionel Messi - 94 - $58
-	Jan Oblak - 91 - $18
-	Luka Modric - 90 - $19
-	N'Golo Kanté - 89 - $37
-	Piqué - 88 - $19
-	Mats Hummels - 87 - $17
-	Jan Vertonghen - 87 - $11
-	Casemiro - 87 - $19
-	Coutinho - 86 - $16
-	Andrew Robertson - 85 - $21
-	Marcelo - 85 - $15
+TEAM BISIG(LIVERPOOL)
+	 Sergio Ramos  - 89 - $45
+	 Harry Kane  - 89 - $5
+	 Ederson  - 88 - $16
+	 Luis Suárez  - 87 - $35
+	 Raheem Sterling  - 87 - $13
+	 Fabinho  - 87 - $30
+	 Giorgio Chiellini  - 86 - $21
+	 Serge Gnabry  - 86 - $9
+	 Thiago Silva  - 85 - $5
+	 Jesús Navas  - 84 - $9
+	 Josip Ilicic  - 84 - $5
+	 Memphis Depay  - 84 - $5
+	 David Alaba  - 83 - $23
+	 Juan Cuadrado  - 82 - $14
+
+TEAM BRION(MANCHESTER CITY)
+	 Mohamed Salah  - 90 - $55
+	 Hugo Lloris  - 87 - $7
+	 Andrew Robertson  - 87 - $15
+	 Erling Haaland  - 87 - $45
+	 Zlatan Ibrahimovic  - 84 - $12
+	 Edinson Cavani  - 84 - $8
+	 Marcelo Brozovic  - 84 - $5
+	 José María Giménez  - 84 - $9
+	 Iker Muniain Goñi  - 83 - $5
+	 Kostas Manolas  - 83 - $16
+	 Nicolás Tagliafico  - 83 - $5
+	 Rafa  - 83 - $9
+	 Clément Lenglet  - 83 - $10
+	 Federico Valverde  - 83 - $15
+	 Theo Hernández  - 82 - $19
 
 GROUP STAGE TABLE
 
 TEAM		P	W	D	L	GF	GA	GD
-Grillo		22	7	1	0	35	10	25
-Caio		19	6	1	1	39	11	28
-Trotta		19	6	1	1	32	18	14
-Maia		16	5	1	2	34	10	24
-Bisig		12	4	0	4	25	21	4
-Dudu		9	3	0	5	23	25	-2
-Bambu		6	2	0	6	12	33	-21
-Brion		3	1	0	7	7	36	-29
-Guido		0	0	0	8	5	48	-43
+Bisig		0	0	0	0	0	0	0
+Brion		0	0	0	0	0	0	0
+Caio		0	0	0	0	0	0	0
+Senna		0	0	0	0	0	0	0
+Maia		0	0	0	0	0	0	0
+Trotta		0	0	0	0	0	0	0
+Guido		0	0	0	0	0	0	0
+Villar		0	0	0	0	0	0	0
+Joe		0	0	0	0	0	0	0
+Dudu		0	0	0	0	0	0	0
 
 MATCHES: 
 
 GROUP 1
-	Grillo 2 x 2 Caio
-	Trotta 2 x 2 Maia
-	Dudu 5 x 1 Brion
-	Bambu 1 x 2 Bisig
-	Guido 1 x 9 Grillo
-	Caio 2 x 3 Trotta
-	Maia 4 x 1 Dudu
-	Brion 0 x 2 Bambu
-	Bisig 5 x 0 Guido
-	Grillo 4 x 1 Trotta
-	Maia 5 x 0 Brion
-	Bambu 3 x 2 Guido
-	Caio 4 x 3 Dudu
-	Maia 5 x 2 Bisig
-	Bambu 0 x 8 Grillo
-	Trotta 6 x 3 Dudu
-	Brion 1 x 5 Bisig
-	Guido 0 x 11 Caio
-	Trotta 6 x 0 Brion
-	Bisig 1 x 3 Grillo
-	Guido 1 x 5 Dudu
-	Maia 7 x 1 Bambu
-	Bisig 2 x 3 Caio
-	Guido 0 x 4 Trotta
-	Brion 3 x 4 Grillo
-	Bisig 4 x 2 Dudu
-	Guido 0 x 9 Maia
-	Bambu 0 x 7 Caio
-	Bisig 4 x 6 Trotta
-	Guido 1 x 2 Brion
-	Grillo 3 x 1 Dudu
-	Trotta 4 x 3 Bambu
-	Caio 2 x 1 Maia
-	Brion 0 x 8 Caio
-	Maia 1 x 2 Grillo
-	Dudu 3 x 2 Bambu
+	Trotta  x  Dudu
+	Joe  x  Villar
+	Brion  x  Bisig
+	Senna  x  Guido
+	Caio  x  Maia
+	Trotta  x  Joe
+	Villar  x  Brion
+	Bisig  x  Senna
+	Guido  x  Caio
+	Maia  x  Dudu
+	Trotta  x  Villar
+	Brion  x  Senna
+	Guido  x  Maia
+	Dudu  x  Joe
+	Trotta  x  Bisig
+	Brion  x  Caio
+	Guido  x  Dudu
+	Joe  x  Bisig
+	Senna  x  Caio
+	Maia  x  Villar
+	Trotta  x  Brion
+	Senna  x  Dudu
+	Maia  x  Joe
+	Bisig  x  Caio
+	Guido  x  Villar
+	Maia  x  Trotta
+	Brion  x  Dudu
+	Guido  x  Joe
+	Maia  x  Bisig
+	Caio  x  Dudu
+	Villar  x  Bisig
+	Senna  x  Joe
+	Trotta  x  Caio
+	Dudu  x  Villar
+	Bisig  x  Guido
+	Senna  x  Maia
+	Dudu  x  Bisig
+	Guido  x  Brion
+	Trotta  x  Senna
+	Maia  x  Brion
+	Caio  x  Joe
+	Trotta  x  Guido
+	Brion  x  Joe
+	Senna  x  Villar
+	Caio  x  Villar
 
 WILDCARD
-	Trotta 4 x 2 Dudu
-	Maia 5 x 2 Bisig
+	Caio 4 x 0 Trotta
+	Senna 1 x 0 Maia
 
 SEMIS
-	Grillo 1 x 4 Maia
-	Caio 6 x 4 Trotta
+	Bisig 2 x 0 Senna
+	Senna 4 x 0 Bisig
+	Brion 1 x 0 Caio
+	Caio 2 x 0 Brion
+
+INTERIOR SEMIS
+	Guido 2 x 0 Dudu
+	Villar 2 x 0 Joe
 
 FINAL
-	Maia 1 x 3 Caio
+	Senna 1 x 4 Caio
+
+INTERIOR FINAL
+	Guido 1 x 0 Villar
 

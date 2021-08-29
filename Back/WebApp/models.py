@@ -231,16 +231,15 @@ class Group(models.Model):
         for team in teams_list:
             stats[team] = self.getStatsTeam(team)
         stats_list = list(stats.items())
-        stats_list = sorted(stats_list, key=lambda x: (x[1]['P'], x[1]['GD'], x[1]['GF'], x[1]['W']), reverse=True)
+        stats_list = sorted(stats_list, key=lambda x: (x[1]['P'], x[1]['W'], x[1]['GD'], x[1]['GF']), reverse=True)
         return stats_list
 
     def generateFinalRound(self):
         teams = self.getGroupTable()
-        qualified = []
+        qualified = list()
 
-        for team in teams:
-            if team[1]['P'] == 3:
-                qualified.append(team[0])
+        qualified.append(teams[0][0])
+        qualified.append(teams[1][0])
 
         matches = []
 

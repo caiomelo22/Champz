@@ -13,27 +13,35 @@
       @click="choice=true; getGroups();"
     >Continue With Latest Matchups</v-btn>-->
     <div>
-      <v-card>
+      <v-card style="height: 100%">
         <v-toolbar color="primary" dark>
           <v-btn
             v-if="currentGroupIndex"
             fab
             text
             large
-            @click="currentGroupIndex--; currentGroup=groups[currentGroupIndex]; final=false;"
+            @click="
+              currentGroupIndex--;
+              final = false;
+            "
           >
             <v-icon dark large>mdi-chevron-left</v-icon>
           </v-btn>
-          <v-toolbar-title class="mx-auto">{{currentGroup.group}}</v-toolbar-title>
+          <v-toolbar-title class="mx-auto">{{
+            get_group_title()
+          }}</v-toolbar-title>
           <v-btn fab text large @click="next_stage_click()">
             <v-icon dark large>mdi-chevron-right</v-icon>
           </v-btn>
         </v-toolbar>
         <v-row>
-          <v-col v-if="currentGroupIndex==0" cols="12" md="8">
+          <v-col v-if="currentGroupIndex == 0" cols="12" md="8">
             <v-row>
               <v-col cols="12" md="11">
-                <table v-if="currentGroupIndex==0" class="table table-striped ml-7">
+                <table
+                  v-if="currentGroupIndex == 0"
+                  class="table table-striped ml-7"
+                >
                   <!-- <template v-slot:default> -->
                   <thead>
                     <tr>
@@ -51,15 +59,19 @@
                     <tr v-for="(team, i) in table" :key="i">
                       <td class="champzFont">
                         <!-- <img style="width:30px;" :src="team[0].image_link" /> -->
-                        {{getTeamParticipant(team[0].participant).name.toUpperCase()}}
+                        {{
+                          getTeamParticipant(
+                            team[0].participant
+                          ).name.toUpperCase()
+                        }}
                       </td>
-                      <td class="champzFont">{{team[1].P}}</td>
-                      <td class="champzFont">{{team[1].W}}</td>
-                      <td class="champzFont">{{team[1].D}}</td>
-                      <td class="champzFont">{{team[1].L}}</td>
-                      <td class="champzFont">{{team[1].GF}}</td>
-                      <td class="champzFont">{{team[1].GA}}</td>
-                      <td class="champzFont">{{team[1].GD}}</td>
+                      <td class="champzFont">{{ team[1].P }}</td>
+                      <td class="champzFont">{{ team[1].W }}</td>
+                      <td class="champzFont">{{ team[1].D }}</td>
+                      <td class="champzFont">{{ team[1].L }}</td>
+                      <td class="champzFont">{{ team[1].GF }}</td>
+                      <td class="champzFont">{{ team[1].GA }}</td>
+                      <td class="champzFont">{{ team[1].GD }}</td>
                     </tr>
                   </tbody>
                   <!-- </template> -->
@@ -72,81 +84,113 @@
           </v-col>
           <v-col
             cols="12"
-            :md="currentGroupIndex? 12:4"
-            :class="currentGroupIndex? 'champzKnockout':'champzMatches'"
+            :md="currentGroupIndex ? 12 : 4"
+            :class="currentGroupIndex ? 'champzKnockout' : 'champzMatches'"
           >
-            <v-simple-table
-              v-if="groups.length>0"
-              :class="currentGroupIndex? 'mx-8':'mr-12'"
-            >
-              <template v-slot:default>
-                <thead class="thead-dark">
-                  <tr>
-                    <th class="champzFont" scope="col">Match</th>
-                    <th class="champzFont" scope="col">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(match, i) in currentGroup.matches" :key="i">
-                    <td
-                      class="champzFont text-center"
-                      v-if="match.goals_team_1 == null && match.goals_team_2 == null"
-                    >
-                      {{getTeamParticipant(getTeamById(match.team_1).participant).name.toUpperCase()}}
-                      <!-- <img
+            <div v-for="group in get_dashboard_matches()" :key="group.id">
+              <v-row class="mx-6">
+                <h3>{{ group.group }}</h3>
+              </v-row>
+              <v-simple-table :class="currentGroupIndex ? 'mx-8' : 'mr-12'">
+                <template v-slot:default>
+                  <thead class="thead-dark">
+                    <tr>
+                      <th class="champzFont" scope="col">Match</th>
+                      <th class="champzFont" scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(match, i) in group.matches" :key="i">
+                      <td
+                        class="champzFont text-center"
+                        v-if="
+                          match.goals_team_1 == null &&
+                          match.goals_team_2 == null
+                        "
+                      >
+                        {{
+                          getTeamParticipant(
+                            getTeamById(match.team_1).participant
+                          ).name.toUpperCase()
+                        }}
+                        <!-- <img
                 style="width:30px;"
                 :src="getTeamById(match.team_1).image_link"
                       />-->
-                      X
-                      <!-- <img style="width:30px;" :src="getTeamById(match.team_2).image_link" /> -->
-                      {{getTeamParticipant(getTeamById(match.team_2).participant).name.toUpperCase()}}
-                    </td>
-                    <td class="champzFont text-center" v-else>
-                      {{getTeamParticipant(getTeamById(match.team_1).participant).name.toUpperCase()}}
-                      <!-- <img
+                        X
+                        <!-- <img style="width:30px;" :src="getTeamById(match.team_2).image_link" /> -->
+                        {{
+                          getTeamParticipant(
+                            getTeamById(match.team_2).participant
+                          ).name.toUpperCase()
+                        }}
+                      </td>
+                      <td class="champzFont text-center" v-else>
+                        {{
+                          getTeamParticipant(
+                            getTeamById(match.team_1).participant
+                          ).name.toUpperCase()
+                        }}
+                        <!-- <img
                 style="width:30px;"
                 :src="getTeamById(match.team_1).image_link"
                       />-->
-                      {{match.goals_team_1}} X
-                      {{match.goals_team_2}}
-                      <!-- <img
+                        {{ match.goals_team_1 }} X
+                        {{ match.goals_team_2 }}
+                        <!-- <img
                 style="width:30px;"
                 :src="getTeamById(match.team_2).image_link"
                       />-->
-                      {{getTeamParticipant(getTeamById(match.team_2).participant).name.toUpperCase()}}
-                    </td>
-                    <td>
-                      <v-btn small fab color="primary" @click="getMatch(match)">
-                        <v-icon small>mdi-pencil</v-icon>
-                      </v-btn>
-                    </td>
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
+                        {{
+                          getTeamParticipant(
+                            getTeamById(match.team_2).participant
+                          ).name.toUpperCase()
+                        }}
+                      </td>
+                      <td>
+                        <v-btn
+                          small
+                          fab
+                          color="primary"
+                          @click="getMatch(match)"
+                        >
+                          <v-icon small>mdi-pencil</v-icon>
+                        </v-btn>
+                      </td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+            </div>
           </v-col>
         </v-row>
         <div class="text-center">
-      <v-btn
-      large
-      class="mx-auto mb-12"
-      light
-      color="primary"
-        v-if="final"
-        v-on:click="generateChampzFile()"
-      >Generate Champz File</v-btn>
-      </div>
+          <v-btn
+            large
+            class="mx-auto mb-12"
+            light
+            color="primary"
+            v-if="final"
+            v-on:click="generateChampzFile()"
+            >Generate Champz File</v-btn
+          >
+        </div>
       </v-card>
       <v-spacer></v-spacer>
-      <a @click="resetConfirmationModal=true">Reset matches</a>
+      <a @click="resetConfirmationModal = true">Reset matches</a>
       <v-dialog v-model="resetConfirmationModal" width="40%">
         <v-card>
           <v-card-title>
-            <h3>Are you sure that you want to reset the matches? All of the current groups are going to be erased.</h3>
+            <h3>
+              Are you sure that you want to reset the matches? All of the
+              current groups are going to be erased.
+            </h3>
           </v-card-title>
           <v-card-text>
             <v-card-actions class="text-center">
-              <v-btn class="mx-auto" color="red" @click="initializeGroup()">Reset</v-btn>
+              <v-btn class="mx-auto" color="red" @click="initializeGroup()"
+                >Reset</v-btn
+              >
             </v-card-actions>
           </v-card-text>
         </v-card>
@@ -162,7 +206,11 @@
           <form v-on:submit.prevent="registerScore()">
             <v-row>
               <v-col cols="12" md="3">
-                <span class="champzFont mr-2 mt-1" style="float: right">{{getTeamParticipant(getTeamById(currentMatch.team_1).participant).name}}</span>
+                <span class="champzFont mr-2 mt-1" style="float: right">{{
+                  getTeamParticipant(
+                    getTeamById(currentMatch.team_1).participant
+                  ).name
+                }}</span>
               </v-col>
               <v-col cols="12" md="2">
                 <v-text-field
@@ -188,10 +236,14 @@
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="3">
-                <span class="champzFont ml-3 mt-1" style="float: left">{{getTeamParticipant(getTeamById(currentMatch.team_2).participant).name}}</span>
+                <span class="champzFont ml-3 mt-1" style="float: left">{{
+                  getTeamParticipant(
+                    getTeamById(currentMatch.team_2).participant
+                  ).name
+                }}</span>
               </v-col>
             </v-row>
-                <!-- <span>{{getTeamParticipant(getTeamById(currentMatch.team_1).participant).name}}</span>
+            <!-- <span>{{getTeamParticipant(getTeamById(currentMatch.team_1).participant).name}}</span>
                 <v-text-field
                   style="float: right"
                   type="number"
@@ -209,7 +261,12 @@
                 ></v-text-field>
                 <span>{{getTeamParticipant(getTeamById(currentMatch.team_2).participant).name}}</span> -->
             <v-card-actions>
-              <v-btn type="button" color="red" @click="registerScoreModal = false">Close</v-btn>
+              <v-btn
+                type="button"
+                color="red"
+                @click="registerScoreModal = false"
+                >Close</v-btn
+              >
               <v-btn type="submit" color="green">Save changes</v-btn>
             </v-card-actions>
           </form>
@@ -220,7 +277,12 @@
   </v-container>
 
   <v-container v-else>
-    <v-progress-circular style="margin-left: 50%" indeterminate size="70" color="primary"></v-progress-circular>
+    <v-progress-circular
+      style="margin-left: 50%"
+      indeterminate
+      size="70"
+      color="primary"
+    ></v-progress-circular>
   </v-container>
 </template>
 
@@ -239,7 +301,7 @@
   height: 64vh;
 }
 .champzKnockout {
-  height: 20vh;
+  height: 100%;
 }
 .champzMatches {
   height: 67vh;
@@ -276,6 +338,17 @@ export default {
     // this.initializeGroup();
   },
   methods: {
+    get_dashboard_matches() {
+      if (this.currentGroupIndex == 0) {
+        return [this.groups[0]];
+      } else if (this.currentGroupIndex == 1) {
+        return [this.groups[1]];
+      } else if (this.currentGroupIndex == 2) {
+        return this.groups.slice(2, 4);
+      } else if (this.currentGroupIndex == 3) {
+        return this.groups.slice(4, 6);
+      }
+    },
     next_stage_click() {
       if (this.currentGroupIndex == 0) {
         this.knockoutStageButtonClick();
@@ -299,6 +372,7 @@ export default {
       this.service
         .getRequest("/api/participant/")
         .then((response) => {
+          console.log(response);
           this.participants = response;
           this.loading = false;
         })
@@ -308,13 +382,18 @@ export default {
         });
     },
     getTeamParticipant: function (id) {
-      var participant = {};
+      var participant = null;
       this.participants.forEach((element) => {
         if (element.id === id) {
           participant = element;
           return participant;
         }
       });
+      if (participant == null) {
+        participant = {
+          name: "",
+        };
+      }
       return participant;
     },
     getTeamById: function (id) {
@@ -367,22 +446,23 @@ export default {
         });
     },
     registerScore: function () {
-      this.loading = true;
+      var groupIndex = this.groups
+        .map((x) => x.id)
+        .indexOf(this.currentMatch.group);
+      var matchIndex = this.groups[groupIndex].matches
+        .map((x) => x.id)
+        .indexOf(this.currentMatch.id);
+      this.groups[groupIndex].matches[matchIndex] = this.currentMatch;
       var url = "/api/match/" + this.currentMatch.id + "/";
+          this.registerScoreModal = false;
       this.service
         .patchRequest(url, this.currentMatch)
         .then((response) => {
-          this.loading = false;
-          this.currentMatch = response;
-          if (this.currentGroupIndex + 1 < this.groups.length) {
-            this.deleteGroups();
-          } else {
-            this.getGroups();
+          if (this.currentGroupIndex == 0) {
+            this.getGroupTable();
           }
-          this.registerScoreModal = false;
         })
         .catch((err) => {
-          this.loading = false;
           console.log(err);
         });
     },
@@ -435,26 +515,38 @@ export default {
     knockoutStageButtonClick: function () {
       if (this.groups.length > 1) {
         this.currentGroupIndex += 1;
-        this.currentGroup = this.groups[this.currentGroupIndex];
       } else {
         this.loading = true;
         this.generateWildcard();
       }
     },
-    nextKnockoutStageButtonClick: function () {
-      if (this.currentGroupIndex + 1 < this.groups.length) {
-        this.currentGroupIndex += 1;
-        this.currentGroup = this.groups[this.currentGroupIndex];
-        if (this.currentGroup.matches.length == 1) {
-          this.final = true;
-        }
+    get_group_title() {
+      if (this.currentGroupIndex == 0) {
+        return "Group Stage";
+      } else if (this.currentGroupIndex == 1) {
+        return "Wildcard";
+      } else if (this.currentGroupIndex == 2) {
+        return "Semis";
       } else {
-        this.loading = true;
-        if (this.currentGroupIndex == 1) {
-          this.generateSemis();
-        } else {
-          this.generateFinal();
-        }
+        return "Finals";
+      }
+    },
+    nextKnockoutStageButtonClick: function () {
+      if (
+        this.currentGroupIndex == 1 &&
+        this.currentGroupIndex + 1 == this.groups.length
+      ) {
+        this.generateSemis();
+      } else if (
+        this.currentGroupIndex == 2 &&
+        this.currentGroupIndex + 2 == this.groups.length
+      ) {
+        this.generateFinal();
+      } else {
+        this.currentGroupIndex += 1;
+      }
+      if (this.currentGroupIndex == 3) {
+        this.final = true;
       }
     },
     generateFirstKnockout: function () {
@@ -475,6 +567,7 @@ export default {
       this.service
         .postRequest("/api/generate_wildcards/")
         .then((response) => {
+          console.log(response);
           this.currentGroupIndex += 1;
           this.getGroups();
         })
@@ -499,9 +592,7 @@ export default {
     generateFinal: function () {
       this.loading = true;
       this.service
-        .postRequest(
-          "/api/generate_final/" + this.groups[this.currentGroupIndex].id
-        )
+        .postRequest("/api/generate_final")
         .then((response) => {
           this.getGroups();
           this.currentGroupIndex += 1;
@@ -541,10 +632,6 @@ export default {
           this.matches.forEach((element) => {
             this.matchToGroup(element);
           });
-          this.currentGroup = this.groups[this.currentGroupIndex];
-          if (this.currentGroup.matches.length == 1) {
-            this.final = true;
-          }
         })
         .catch((err) => {
           this.loading = false;

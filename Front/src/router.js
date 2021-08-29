@@ -7,7 +7,6 @@ import Matches from "./views/dashboard/matches/routes";
 Vue.use(Router);
 
 const router = new Router({
-  base: "http://localhost:8080/",
   linkActiveClass: "active",
   linkExactActiveClass: "exact-active",
   component: () => Index,

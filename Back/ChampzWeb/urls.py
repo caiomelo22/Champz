@@ -16,6 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
+from django.conf import settings
+from django.conf.urls.static import static
 
 from WebApp import urls as WebAppUrls
 
@@ -25,3 +27,4 @@ urlpatterns = [
     path('webapp', TemplateView.as_view(template_name='teste.html')),
     path('webapp/matches', TemplateView.as_view(template_name='matches.html')),
 ]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

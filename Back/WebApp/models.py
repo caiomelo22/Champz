@@ -65,6 +65,7 @@ class Team(models.Model):
 class Position(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
+    specific_positions = models.CharField(max_length=100, null=True)
 
     @classmethod
     def create(cls, name):

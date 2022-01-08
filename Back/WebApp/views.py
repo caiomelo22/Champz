@@ -149,13 +149,19 @@ class PlayerViewSet(viewsets.ModelViewSet):
         player = PlayerSerializer(player, context={'request': request})
         return Response(player.data)
 
-    # def list(self, request, *args, **kwargs):
-    #     print(request.__dict__)
-    #     print(args)
-    #     print(kwargs)
-    #     players = list(Player.objects.all().order_by('-likes', '-overall'))
-    #     players = sorted(players, key=operator.attrgetter('likes'))
-    #     return Response(PlayerSerializer(players, many=True).data)
+    def list(self, request, *args, **kwargs):
+        players = list(Player.objects.all().order_by('-overall'))
+        if 'team_participant' in request._request.__dict__['environ']['QUERY_STRING']:
+            team_participant = request._request.__dict__['environ']['QUERY_STRING'].split('=')[1]
+            players = [player for player in players if str(player.team_participant_id)==team_participant]
+            print(players)
+        if 'position' in request._request.__dict__['environ']['QUERY_STRING']:
+            position = request._request.__dict__['environ']['QUERY_STRING'].split('=')[1]
+            position_obj = Position.objects.filter(id=position)[0]
+            print(position_obj.specific_positions.split(';'))
+            players = [player for player in players if player.specific_position in position_obj.specific_positions.split(';')]
+        players.sort(key=lambda item: (item.overall, item.pace), reverse=True)
+        return Response(PlayerSerializer(players, many=True).data)
 
 
 class GroupViewSet(viewsets.ModelViewSet):

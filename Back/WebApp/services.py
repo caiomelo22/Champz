@@ -7,6 +7,12 @@ from selenium.webdriver.chrome.options import Options
 from openpyxl.styles import Color, PatternFill, Font, Border
 from webdriver_manager.chrome import ChromeDriverManager
 from openpyxl.styles import colors
+import requests
+import io
+from django.conf import settings
+from PIL import Image
+import time
+
 
 def get_id_from_href(link):
     start = link.find("player/")
@@ -22,11 +28,14 @@ def get_jogador_index(obj, position):
             return player.id
     return -1
 
+
 def strip_player_positions_string():
     players = Player.objects.all()
     for player in players:
-        player.specific_position = player.specific_position.split('|')[0].strip()
+        player.specific_position = player.specific_position.split('|')[
+            0].strip()
         player.save()
+
 
 def get_futbin_data():
     positions = {'Goalkeepers': 'GK', 'Center Backs': 'CB', 'Full Backs': 'RB,LB', 'Defensive Midfielders': 'CDM,CM',
@@ -36,8 +45,12 @@ def get_futbin_data():
     base_url = "https://www.fifacm.com/players?position="
 
     option = Options()
-    option.headless = True
-    driver = webdriver.Chrome(ChromeDriverManager().install(), options=option)
+    # option.headless = True
+    options = webdriver.ChromeOptions()
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    options.add_experimental_option('useAutomationExtension', False)
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     # driver.maximize_window()
     # print(playerRows)
 
@@ -51,13 +64,15 @@ def get_futbin_data():
 
         # PEGANDO OS JOGADORES DO FUTBIN
 
-        for pagina in range(1,4):
+        for pagina in range(1, 4):
             url = base_url + positions
 
             url = url + '&page=' + str(pagina)
             print(url)
 
             driver.get(url)
+
+            driver.maximize_window()
             time.sleep(5)
 
             igs_btns = driver.find_elements_by_class_name("igs-btn")
@@ -67,13 +82,16 @@ def get_futbin_data():
             if positions == 'GK':
                 scrollStride = 210
 
+            # print(igs_btns)
             for btn in igs_btns:
                 btn.click()
-                driver.execute_script("window.scrollTo({}, {})".format(scroll, scroll + scrollStride))
+                driver.execute_script("window.scrollTo({}, {})".format(
+                    scroll, scroll + scrollStride))
                 scroll += scrollStride
                 time.sleep(1)
 
-                element = driver.find_elements_by_class_name("site-players-page")[0]
+                element = driver.find_elements_by_class_name(
+                    "site-players-page")[0]
                 htmlContent = element.get_attribute('outerHTML')
 
                 page_soup = soup(htmlContent, "html.parser")
@@ -85,15 +103,33 @@ def get_futbin_data():
                 player = Player(position=position)
 
                 tds = trList[0].findAll("td")
-                player.id = tds[0].find('div', {"class": "igs-btn"})['data-playerid']
+                player.id = tds[0].find(
+                    'div', {"class": "igs-btn"})['data-playerid']
 
-                team = tds[1].findAll('img', {"class": "team-img"})[0]['data-original-title']
-                nation = tds[1].findAll('img', {"class": "team-img"})[1]['data-original-title']
-                team_img = tds[1].findAll('img', {"class": "team-img"})[0]['src']
-                nation_img = tds[1].findAll('img', {"class": "team-img"})[1]['src']
+                other_player = Player.objects.filter(id=player.id)
+                if other_player.exists():
+                    cont += 2
+                    continue
+
+                team = tds[1].findAll(
+                    'img', {"class": "team-img"})[0]['data-original-title']
+                nation = tds[1].findAll(
+                    'img', {"class": "team-img"})[1]['data-original-title']
+                team_img = tds[1].findAll(
+                    'img', {"class": "team-img"})[0]['src']
+                nation_img = tds[1].findAll(
+                    'img', {"class": "team-img"})[1]['src']
 
                 query = Team.objects.filter(name=team)
                 if len(query) == 0:
+                    if('notfound' not in team_img):
+                        image_content = requests.get(team_img).content
+                        image_file = io.BytesIO(image_content)
+                        file_path = settings.BASE_DIR + \
+                            "/Teams/{}.jpg".format(team.replace(' ', ''))
+                        open(file_path, "wb").write(image_file.getbuffer())
+
+                        team_img = file_path
                     team = Team.objects.create(name=team, image_link=team_img)
                 else:
                     team = query[0]
@@ -101,26 +137,56 @@ def get_futbin_data():
 
                 query = Nation.objects.filter(name=nation)
                 if len(query) == 0:
+                    if('notfound' not in nation_img):
+                        image_content = requests.get(nation_img).content
+                        image_file = io.BytesIO(image_content)
+                        file_path = settings.BASE_DIR + \
+                            "/Nations/{}.jpg".format(nation.replace(' ', ''))
+                        open(file_path, "wb").write(image_file.getbuffer())
+
+                        nation_img = file_path
                     nation = Nation.create(nation, nation_img)
                 else:
                     nation = query[0]
                 player.nation = nation
 
-                player.specific_position = ''.join(tds[1].find('div', {"class": "player-position-cln"}).findAll(text=True)).split(',')[0].split('|').strip()
-                stats = trList[1].find("div", {"class": "player-stats"}).findAll("div", {"class": "col-md-2"})
-                player.image_link = tds[1].find('img', {"class": "player-img-info"})['src']
-                player.name = ''.join(tds[1].find('div', {"class": "player-name"}).find("a").findAll(text=True))
-                player.overall = ''.join(tds[2].find('div', {"class": "player-overall"}).findAll(text=True))
-                player.pace = ''.join(stats[0].find("div", {"class": "main-stat-rating-title"}).findAll(text=True))
-                player.shooting = ''.join(stats[1].find("div", {"class": "main-stat-rating-title"}).findAll(text=True))
-                player.passing = ''.join(stats[2].find("div", {"class": "main-stat-rating-title"}).findAll(text=True))
-                player.dribbling = ''.join(stats[3].find("div", {"class": "main-stat-rating-title"}).findAll(text=True))
-                player.defending = ''.join(stats[4].find("div", {"class": "main-stat-rating-title"}).findAll(text=True))
-                player.physical = ''.join(stats[5].find("div", {"class": "main-stat-rating-title"}).findAll(text=True))
+                player.specific_position = ''.join(tds[1].find(
+                    'div', {"class": "player-position-cln"}).findAll(text=True)).split(',')[0].split('|')[0].strip()
+                stats = trList[1].find(
+                    "div", {"class": "player-stats"}).findAll("div", {"class": "col-md-2"})
+                player.name = ''.join(tds[1].find(
+                    'div', {"class": "player-name"}).find("a").findAll(text=True))
 
-                other_player = Player.objects.filter(id=player.id)
-                if not other_player.exists():
-                    player.save()
+                player_img_url = tds[1].find(
+                    'img', {"class": "player-img-info"})['src']
+                if('notfound_player' not in player_img_url):
+                    image_content = requests.get(player_img_url).content
+                    image_file = io.BytesIO(image_content)
+                    file_path = settings.BASE_DIR + \
+                        "/Players/{}_{}.jpg".format(
+                            player.name.replace(' ', ''), player.id)
+                    open(file_path, "wb").write(image_file.getbuffer())
+
+                    player.image_link = file_path
+                else:
+                    cont += 2
+                    continue
+                player.overall = ''.join(tds[2].find(
+                    'div', {"class": "player-overall"}).findAll(text=True))
+                player.pace = ''.join(stats[0].find(
+                    "div", {"class": "main-stat-rating-title"}).findAll(text=True))
+                player.shooting = ''.join(stats[1].find(
+                    "div", {"class": "main-stat-rating-title"}).findAll(text=True))
+                player.passing = ''.join(stats[2].find(
+                    "div", {"class": "main-stat-rating-title"}).findAll(text=True))
+                player.dribbling = ''.join(stats[3].find(
+                    "div", {"class": "main-stat-rating-title"}).findAll(text=True))
+                player.defending = ''.join(stats[4].find(
+                    "div", {"class": "main-stat-rating-title"}).findAll(text=True))
+                player.physical = ''.join(stats[5].find(
+                    "div", {"class": "main-stat-rating-title"}).findAll(text=True))
+
+                player.save()
 
                 cont += 2
 
@@ -239,20 +305,30 @@ def get_futbin_data():
 
     driver.quit()
 
+
 def getPlayersByPositionAlgorythm(position_id, n):
     n = int(n)
-    players = list(Player.objects.filter(position=position_id).order_by('-overall', '-pace'))
+    position_obj = Position.objects.filter(id=position_id)[0]
+    print(position_obj.specific_positions.split(';'))
+    players = list(Player.objects.all().order_by('-overall'))
+    players = [
+        player for player in players if player.specific_position in position_obj.specific_positions.split(';')]
+    players.sort(key=lambda item: (item.overall, item.pace), reverse=True)
     players = players[:n]
-    # players.sort(key=lambda x: x.overall, reverse=True)
-    # print(position_id, len(players), players)
     return players
 
+
 def colourCell(cell, stat):
-    redFill = PatternFill(start_color='FF0000',end_color='FF0000',fill_type='solid')
-    orangeFill = PatternFill(start_color='FF8F00',end_color='FF8F00',fill_type='solid')
-    yellowFill = PatternFill(start_color='F6EB0A',end_color='F6EB0A',fill_type='solid')
-    lightGreenFill = PatternFill(start_color='2DD63A',end_color='2DD63A',fill_type='solid')
-    greenFill = PatternFill(start_color='3E9C45',end_color='3E9C45',fill_type='solid')
+    redFill = PatternFill(start_color='FF0000',
+                          end_color='FF0000', fill_type='solid')
+    orangeFill = PatternFill(start_color='FF8F00',
+                             end_color='FF8F00', fill_type='solid')
+    yellowFill = PatternFill(start_color='F6EB0A',
+                             end_color='F6EB0A', fill_type='solid')
+    lightGreenFill = PatternFill(
+        start_color='2DD63A', end_color='2DD63A', fill_type='solid')
+    greenFill = PatternFill(start_color='3E9C45',
+                            end_color='3E9C45', fill_type='solid')
     cell.value = stat
 
     if stat >= 90:
@@ -268,12 +344,14 @@ def colourCell(cell, stat):
 
     return cell
 
+
 def getPlayersByPositionString(sheet, position, n):
     players = getPlayersByPositionAlgorythm(position.id, n)
     writePlayersSheet(sheet, players)
     return sheet
 
-def writePlayersSheet (sheet, players):
+
+def writePlayersSheet(sheet, players):
     sheet.oddHeader.center.size = 14
     sheet.oddHeader.center.font = "Calibri,Bold"
     sheet.cell(row=1, column=1).value = 'PLAYER'
@@ -289,7 +367,7 @@ def writePlayersSheet (sheet, players):
     sheet.cell(row=1, column=11).value = 'PHYSICAL'
     sheet.cell(row=1, column=12).value = 'VALUE'
 
-    for i,player in enumerate(players):
+    for i, player in enumerate(players):
         sheet.cell(row=i+2, column=1).value = player.name
         sheet.cell(row=i+2, column=2).value = player.team_origin.name
         sheet.cell(row=i+2, column=3).value = player.nation.name

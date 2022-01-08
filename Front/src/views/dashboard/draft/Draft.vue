@@ -6,7 +6,11 @@
           <h3>Set budget</h3>
         </v-card-title>
         <v-card-text>
-          <v-text-field class="mt-2" min="0" v-model="genericBudget"></v-text-field>
+          <v-text-field
+            class="mt-2"
+            min="0"
+            v-model="genericBudget"
+          ></v-text-field>
         </v-card-text>
       </v-card>
     </v-row>
@@ -41,18 +45,23 @@
               </thead>
               <tbody>
                 <tr v-for="(participant, i) in participants" :key="i">
-                  <td class="champzFont">{{participant.id}}</td>
-                  <td class="champzFont">{{participant.name}}</td>
-                  <td class="champzFont">${{participant.budget}}</td>
+                  <td class="champzFont">{{ participant.id }}</td>
+                  <td class="champzFont">{{ participant.name }}</td>
+                  <td class="champzFont">${{ participant.budget }}</td>
                   <td class="champzFont">
                     <!-- <img
                       style="width:30px;"
                       :src="getPlayerTeam(getParticipantTeam(participant.id).id).image_link"
                     />-->
-                    {{getParticipantTeam(participant.id).name}}
+                    {{ getParticipantTeam(participant.id).name }}
                   </td>
                   <td>
-                    <v-btn color="blue" small fab @click="open_participant_dialog(participant)">
+                    <v-btn
+                      color="blue"
+                      small
+                      fab
+                      @click="open_participant_dialog(participant)"
+                    >
                       <v-icon>mdi-pencil</v-icon>
                     </v-btn>
                     <v-btn
@@ -69,7 +78,15 @@
                       class="ml-2"
                       small
                       fab
-                      @click="currentParticipant=participant;getPlayersByTeam(getParticipantTeam(participant.id).id);showParticipantTeamModal = true"
+                      :loading="participant.teamLoading"
+                      @click="
+                        currentParticipant = participant;
+                        getPlayersByTeam(
+                          participant.id,
+                          getParticipantTeam(participant.id).id
+                        );
+                        showParticipantTeamModal = true;
+                      "
                     >
                       <v-icon>mdi-eye</v-icon>
                     </v-btn>
@@ -88,17 +105,19 @@
           <h3>List of Players</h3>
         </v-card-title>
         <v-card-text>
-          <v-btn-toggle class="mx-8 mt-2" v-model="toggle_exclusive" rounded>
-            <v-btn color="purple" @click="selectedPosition=keepers">Goalkeepers</v-btn>
-            <v-btn color="purple" @click="selectedPosition=centerBacks">Center Backs</v-btn>
-            <v-btn color="purple" @click="selectedPosition=fullBacks">Full Backs</v-btn>
-            <v-btn color="purple" @click="selectedPosition=defensiveMids">Defensive Midfielders</v-btn>
-            <v-btn color="purple" @click="selectedPosition=attackingMids">Ofensive Midfielders</v-btn>
-            <v-btn color="purple" @click="selectedPosition=wingers">Wingers</v-btn>
-            <v-btn color="purple" @click="selectedPosition=attackers">Attackers</v-btn>
-          </v-btn-toggle>
-
-          <v-simple-table class="mt-4">
+          <v-tabs v-model="tab">
+            <v-tab>Goalkeepers</v-tab>
+            <v-tab>Center Backs</v-tab>
+            <v-tab>Full Backs</v-tab>
+            <v-tab>Defensive Midfielders</v-tab>
+            <v-tab>Ofensive Midfielders</v-tab>
+            <v-tab>Wingers</v-tab>
+            <v-tab>Attackers</v-tab>
+          </v-tabs>
+          <v-row justify="center" v-if="playersLoading" class="my-6">
+            <v-progress-circular indeterminate size="15"></v-progress-circular>
+          </v-row>
+          <v-simple-table class="mt-4" v-else>
             <template v-slot:default>
               <thead>
                 <tr>
@@ -125,28 +144,36 @@
               </thead>
               <tbody>
                 <tr v-for="(player, i) in selectedPosition" :key="i">
-                  <td class="champzFont">{{player.id}}</td>
+                  <td class="champzFont">{{ player.id }}</td>
+                  <!-- <td class="champzFont">
+                    <img :src="gs.getPlayerImageLink(player.image_link)">
+                  </td> -->
                   <td class="champzFont">
                     <!-- <img class="mb-2" style="width:30px;" :src="getPlayerNation(player.nation).image_link" />
                     <img class="ml-1" style="width:30px;" :src="getPlayerTeam(player.team_origin).image_link" />-->
-                    <span>{{player.name}}</span>
+                    <span>{{ player.name }}</span>
                   </td>
-                  <td class="champzFont">{{player.overall}}</td>
-                  <td class="champzFont">{{player.specific_position}}</td>
+                  <td class="champzFont">{{ player.overall }}</td>
+                  <td class="champzFont">{{ player.specific_position }}</td>
                   <td class="champzFont">
                     <!-- <img
                       v-show="player.team_participant!=null"
                       style="width:30px;"
                       :src="getPlayerTeam(player.team_participant).image_link"
                     />-->
-                    {{getPlayerOwner(player.team_participant)}}
+                    {{ getPlayerOwner(player.team_participant) }}
                   </td>
-                  <td class="champzFont">${{player.value}}</td>
+                  <td class="champzFont">${{ player.value }}</td>
                   <td>
                     <v-btn color="green" fab @click="getPlayer(player)">
                       <v-icon large>mdi-cash-plus</v-icon>
                     </v-btn>
-                    <v-btn color="red" fab class="ml-2" @click="removeBuy(player.id)">
+                    <v-btn
+                      color="red"
+                      fab
+                      class="ml-2"
+                      @click="removeBuy(player.id)"
+                    >
                       <v-icon large>mdi-cash-minus</v-icon>
                     </v-btn>
                   </td>
@@ -187,7 +214,10 @@
         </v-card-title>
         <v-card-text>
           <form @submit.prevent="addParticipant()">
-            <v-text-field label="Name" v-model="newParticipant.name"></v-text-field>
+            <v-text-field
+              label="Name"
+              v-model="newParticipant.name"
+            ></v-text-field>
             <v-combobox
               v-model="newParticipant.team"
               :items="plTeams"
@@ -197,7 +227,9 @@
               dense
             ></v-combobox>
             <v-card-actions>
-              <v-btn color="red" @click="addParticipantModal = false">Cancel</v-btn>
+              <v-btn color="red" @click="addParticipantModal = false"
+                >Cancel</v-btn
+              >
               <v-btn type="submit" color="green">Save changes</v-btn>
             </v-card-actions>
           </form>
@@ -211,9 +243,14 @@
           <h5>BUY PLAYER</h5>
         </v-card-title>
         <v-card-text>
-          <h4>{{currentPlayer.name}}</h4>
+          <h4>{{ currentPlayer.name }}</h4>
           <form v-on:submit.prevent="buyPlayer()">
-            <v-text-field type="number" v-model="currentPlayer.value" label="Value" prefix="$"></v-text-field>
+            <v-text-field
+              type="number"
+              v-model="currentPlayer.value"
+              label="Value"
+              prefix="$"
+            ></v-text-field>
             <v-combobox
               v-model="currentPlayer.team_participant"
               :items="participants"
@@ -234,7 +271,7 @@
     <v-dialog v-model="showParticipantTeamModal" width="40%">
       <v-card>
         <v-card-title>
-          <h5>{{currentParticipant.name}}'s Team</h5>
+          <h5>{{ currentParticipant.name }}'s Team</h5>
         </v-card-title>
         <v-card-text>
           <v-simple-table>
@@ -249,17 +286,22 @@
             </thead>
             <tbody>
               <tr v-for="(player, i) in selectedTeam" :key="i">
-                <th scope="row">{{player.id}}</th>
-                <td>{{player.name}}</td>
-                <td>{{player.overall}}</td>
-                <td>{{player.value}}</td>
+                <th scope="row">{{ player.id }}</th>
+                <td>{{ player.name }}</td>
+                <td>{{ player.overall }}</td>
+                <td>{{ player.value }}</td>
                 <td>
                   <v-btn
                     color="red"
-                    @click="removeBuy(player.id);getPlayersByTeam(getParticipantTeam(currentParticipant.id).id);"
+                    @click="
+                      removeBuy(player.id);
+                      getPlayersByTeam(
+                        currentParticipant.id,
+                        getParticipantTeam(currentParticipant.id).id
+                      );
+                    "
                   >
-                    Remove
-                    Buy
+                    Remove Buy
                   </v-btn>
                 </td>
               </tr>
@@ -270,7 +312,12 @@
     </v-dialog>
   </v-container>
   <v-container v-else>
-    <v-progress-circular style="margin-left: 50%" indeterminate size="70" color="primary"></v-progress-circular>
+    <v-progress-circular
+      style="margin-left: 50%"
+      indeterminate
+      size="70"
+      color="primary"
+    ></v-progress-circular>
   </v-container>
 </template>
 
@@ -284,11 +331,14 @@
 
 <script>
 import Service from "@/services/Service";
+import GeneralServices from "@/services/GeneralServices";
 export default {
   name: "Draft",
   data: () => ({
+    gs: new GeneralServices(),
     service: new Service(),
-    toggle_exclusive: undefined,
+    playersLoading: false,
+    tab: 0,
     addParticipantModal: false,
     buyPlayerModal: false,
     showParticipantTeamModal: false,
@@ -315,6 +365,25 @@ export default {
     selectedTeam: null,
     newParticipant: { name: null, budget: null, team: null },
   }),
+  watch: {
+    tab() {
+      if (this.tab == 0) {
+        this.selectedPosition = this.keepers;
+      } else if (this.tab == 1) {
+        this.selectedPosition = this.centerBacks;
+      } else if (this.tab == 2) {
+        this.selectedPosition = this.fullBacks;
+      } else if (this.tab == 3) {
+        this.selectedPosition = this.defensiveMids;
+      } else if (this.tab == 4) {
+        this.selectedPosition = this.attackingMids;
+      } else if (this.tab == 5) {
+        this.selectedPosition = this.wingers;
+      } else if (this.tab == 6) {
+        this.selectedPosition = this.attackers;
+      }
+    },
+  },
   mounted: function () {
     this.getParticipants();
     this.getLeagues();
@@ -323,12 +392,10 @@ export default {
     this.getPositions();
   },
   methods: {
-    select_cbx_item: function(id, array) {
+    select_cbx_item: function (id, array) {
       var i;
-      for(i=0;i<array.length;i++)
-      {
-        if(array[i].id == id)
-        {
+      for (i = 0; i < array.length; i++) {
+        if (array[i].id == id) {
           return array[i];
         }
       }
@@ -350,6 +417,10 @@ export default {
       this.service
         .getRequest("/api/participant/")
         .then((response) => {
+          response = response.map((x) => {
+            x.teamLoading = false;
+            return x;
+          });
           this.participants = response;
           this.loading = false;
         })
@@ -412,26 +483,27 @@ export default {
       }
     },
     selectPlayers: function (a, b) {
-    if (a.overall > b.overall) {
+      if (a.overall > b.overall) {
         return 1;
-    } else if (a.overall < b.overall) { 
+      } else if (a.overall < b.overall) {
         return -1;
-    }
+      }
 
-    // Else go to the 2nd item
-    if (a.pace < b.pace) { 
+      // Else go to the 2nd item
+      if (a.pace < b.pace) {
         return -1;
-    } else if (a.pace > b.pace) {
-        return 1
-    } else { // nothing to split them
+      } else if (a.pace > b.pace) {
+        return 1;
+      } else {
+        // nothing to split them
         return 0;
-    }
+      }
       // return (
       //   (a.overall * 100 + a.likes) / 101 - (b.overall * 100 + b.likes) / 101
       // );
     },
     filterPlayers: function (array, n) {
-      console.log(array)
+      console.log(array);
       array.sort(this.selectPlayers);
       array.reverse();
       array = array.slice(0, Math.round(n * this.participants.length));
@@ -451,27 +523,27 @@ export default {
           } else if (id_position === this.positions[1].id) {
             this.centerBacks = response;
             this.centerBacks = this.filterPlayers(this.centerBacks, 3);
-            this.selectedPosition =  this.centerBacks;
+            this.selectedPosition = this.centerBacks;
           } else if (id_position === this.positions[2].id) {
             this.fullBacks = response;
             this.fullBacks = this.filterPlayers(this.fullBacks, 3);
-            this.selectedPosition =  this.fullBacks;
+            this.selectedPosition = this.fullBacks;
           } else if (id_position === this.positions[3].id) {
             this.defensiveMids = response;
             this.defensiveMids = this.filterPlayers(this.defensiveMids, 3);
-            this.selectedPosition =  this.defensiveMids;
+            this.selectedPosition = this.defensiveMids;
           } else if (id_position === this.positions[4].id) {
             this.attackingMids = response;
             this.attackingMids = this.filterPlayers(this.attackingMids, 1.5);
-            this.selectedPosition =  this.attackingMids;
+            this.selectedPosition = this.attackingMids;
           } else if (id_position === this.positions[5].id) {
             this.wingers = response;
             this.wingers = this.filterPlayers(this.wingers, 2.5);
-            this.selectedPosition =  this.wingers;
+            this.selectedPosition = this.wingers;
           } else if (id_position === this.positions[6].id) {
             this.attackers = response;
             this.attackers = this.filterPlayers(this.attackers, 2);
-            this.selectedPosition =  this.attackers;
+            this.selectedPosition = this.attackers;
           }
           this.loading = false;
         })
@@ -480,17 +552,18 @@ export default {
           console.log(err);
         });
     },
-    getPlayersByTeam: function (id_team) {
-      this.loading = true;
+    getPlayersByTeam: function (participant_id, id_team) {
+      var index = this.participants.map((x) => x.id).indexOf(participant_id);
+      this.participants[index].teamLoading = true;
       return this.service
         .getRequest("/api/player?team_participant=" + id_team)
         .then((response) => {
           this.selectedTeam = response;
-          this.loading = false;
+          this.participants[index].teamLoading = false;
           return response;
         })
         .catch((err) => {
-          this.loading = false;
+          this.participants[index].teamLoading = false;
           console.log(err);
         });
     },
@@ -544,9 +617,10 @@ export default {
     getPlayer: function (player) {
       // this.currentPlayer = player;
       this.currentPlayer = Object.assign({}, player);
-      if(this.currentPlayer.team_participant != null)
-      {
-        this.currentPlayer.team_participant = this.getPlayerTeam(this.currentPlayer.team_participant);
+      if (this.currentPlayer.team_participant != null) {
+        this.currentPlayer.team_participant = this.getPlayerTeam(
+          this.currentPlayer.team_participant
+        );
       }
       this.buyPlayerModal = true;
 
@@ -613,9 +687,7 @@ export default {
             this.loading = false;
             console.log(err);
           });
-      }
-      else
-      {
+      } else {
         this.updateParticipant();
       }
     },
@@ -673,23 +745,35 @@ export default {
           console.log(err);
         });
     },
-    buyPlayer: function () {
-      this.loading = true;
-      this.currentPlayer.team_participant = this.currentPlayer.team_participant.team;
+    updateParticipantBudget() {
+      var index = this.participants
+        .map((x) => x.team)
+        .indexOf(this.currentPlayer.team_participant);
+      this.participants[index].budget -= this.currentPlayer.value;
+    },
+    updatePlayer() {
+      var index = this.selectedPosition
+        .map((x) => x.id)
+        .indexOf(this.currentPlayer.id);
+      this.selectedPosition[index] = this.currentPlayer;
+    },
+    async buyPlayer() {
+      this.buyPlayerModal = false;
+      this.playersLoading = true;
+      this.currentPlayer.team_participant =
+        this.currentPlayer.team_participant.team;
       var url = "/api/buy/" + this.currentPlayer.id;
-      this.service
+      await this.service
         .postRequest(url, this.currentPlayer)
         .then((response) => {
-          this.loading = false;
           this.currentPlayer = response;
-          this.getPlayersByPosition(this.currentPlayer.position);
-          this.getParticipants();
-          this.buyPlayerModal = false;
+          this.updatePlayer();
+          this.updateParticipantBudget();
         })
         .catch((err) => {
-          this.loading = false;
           console.log(err);
         });
+      this.playersLoading = false;
     },
     generateTransfersFile: function () {
       this.loading = true;

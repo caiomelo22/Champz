@@ -7,15 +7,15 @@ export default class Service {
     this.apiClient = new ApiClient();
   }
 
-  async getPlayerImageLink(link) {
+  getPlayerImageLink(link) {
     var index = link.indexOf('Player');
     return `http://127.0.0.1:8000/wwwroot/${link.slice(index, link.length)}`
   }
-  async getNationImageLink(link) {
+  getNationImageLink(link) {
     var index = link.indexOf('Nation');
     return `http://localhost:8000/wwwroot/${link.slice(index, link.length)}`
   }
-  async getTeamImageLink(link) {
+  getTeamImageLink(link) {
     var index = link.indexOf('Team');
     return `http://localhost:8000/wwwroot/${link.slice(index, link.length)}`
   }

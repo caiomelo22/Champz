@@ -49,10 +49,15 @@
                   <td class="champzFont">{{ participant.name }}</td>
                   <td class="champzFont">${{ participant.budget }}</td>
                   <td class="champzFont">
-                    <!-- <img
-                      style="width:30px;"
-                      :src="getPlayerTeam(getParticipantTeam(participant.id).id).image_link"
-                    />-->
+                    <img
+                      style="width: 30px"
+                      :src="
+                        gs.getTeamImageLink(
+                          getPlayerTeam(getParticipantTeam(participant.id).id)
+                            .image_link
+                        )
+                      "
+                    />
                     {{ getParticipantTeam(participant.id).name }}
                   </td>
                   <td>
@@ -145,12 +150,29 @@
               <tbody>
                 <tr v-for="(player, i) in selectedPosition" :key="i">
                   <td class="champzFont">{{ player.id }}</td>
-                  <!-- <td class="champzFont">
-                    <img :src="gs.getPlayerImageLink(player.image_link)">
-                  </td> -->
                   <td class="champzFont">
-                    <!-- <img class="mb-2" style="width:30px;" :src="getPlayerNation(player.nation).image_link" />
-                    <img class="ml-1" style="width:30px;" :src="getPlayerTeam(player.team_origin).image_link" />-->
+                    <img
+                      :src="gs.getPlayerImageLink(player.image_link)"
+                      style="max-height: 80px"
+                    />
+                    <img
+                      style="width: 30px"
+                      :src="
+                        gs.getNationImageLink(
+                          getPlayerNation(player.nation).image_link
+                        )
+                      "
+                    />
+                    <img
+                      style="width: 30px"
+                      :src="
+                        gs.getTeamImageLink(
+                          getPlayerTeam(player.team_origin).image_link
+                        )
+                      "
+                    />
+                  </td>
+                  <td class="champzFont">
                     <span>{{ player.name }}</span>
                   </td>
                   <td class="champzFont">{{ player.overall }}</td>
@@ -237,13 +259,101 @@
       </v-card>
     </v-dialog>
     <!-- Buy Player Modal -->
-    <v-dialog v-model="buyPlayerModal" width="40%">
+    <v-dialog v-if="buyPlayerModal" v-model="buyPlayerModal" width="40%">
       <v-card>
         <v-card-title>
           <h5>BUY PLAYER</h5>
         </v-card-title>
         <v-card-text>
-          <h4>{{ currentPlayer.name }}</h4>
+          <div class="text-center player-card">
+            <div class="card-left-info">
+              <span
+                style="margin-bottom: 10px; font-size: 40px; font-weight: bold"
+                >{{ currentPlayer.overall }}</span
+              >
+              <span style="font-size: 25px">{{
+                currentPlayer.specific_position
+              }}</span>
+              <img
+                style="width: 60px"
+                :src="
+                  gs.getNationImageLink(
+                    getPlayerNation(currentPlayer.nation).image_link
+                  )
+                "
+              />
+              <img
+                style="width: 60px"
+                :src="
+                  gs.getTeamImageLink(
+                    getPlayerTeam(currentPlayer.team_origin).image_link
+                  )
+                "
+              />
+            </div>
+            <img
+              :src="gs.getPlayerImageLink(currentPlayer.image_link)"
+              style="
+                max-height: 160px;
+                z-index: 2;
+                position: absolute;
+                top: 176px;
+                left: 235px;
+              "
+            />
+            <div class="card-name">
+              <span style="font-weight: 700; font-size: 17px">{{
+                currentPlayer.name
+              }}</span>
+            </div>
+            <div class="card-stats">
+              <div class="vertical-divisor"></div>
+              <div class="card-stats-left">
+                <v-row no-gutters>
+                  <span class="mr-1 card-stat-value">{{
+                    currentPlayer.pace
+                  }}</span
+                  ><span class="mr-1 card-stat-name">PAC</span>
+                </v-row>
+                <v-row no-gutters>
+                  <span class="mr-1 card-stat-value">{{
+                    currentPlayer.shooting
+                  }}</span
+                  ><span class="mr-1 card-stat-name">SHO</span>
+                </v-row>
+                <v-row no-gutters>
+                  <span class="mr-1 card-stat-value">{{
+                    currentPlayer.passing
+                  }}</span
+                  ><span class="mr-1 card-stat-name">PAS</span>
+                </v-row>
+              </div>
+              <div class="card-stats-right text-end">
+                <v-row no-gutters>
+                  <span class="mr-1 card-stat-value">{{
+                    currentPlayer.dribbling
+                  }}</span
+                  ><span class="mr-1 card-stat-name">DRI</span>
+                </v-row>
+                <v-row no-gutters>
+                  <span class="mr-1 card-stat-value">{{
+                    currentPlayer.defending
+                  }}</span
+                  ><span class="mr-1 card-stat-name">DEF</span>
+                </v-row>
+                <v-row no-gutters>
+                  <span class="mr-1 card-stat-value">{{
+                    currentPlayer.physical
+                  }}</span
+                  ><span class="mr-1 card-stat-name">PHY</span>
+                </v-row>
+              </div>
+            </div>
+            <img
+              src="../../../assets/gold.png"
+              style="height: 500px; z-index: 1"
+            />
+          </div>
           <form v-on:submit.prevent="buyPlayer()">
             <v-text-field
               type="number"
@@ -259,7 +369,8 @@
               outlined
               dense
             ></v-combobox>
-            <v-card-actions>
+            <v-card-actions style="display: flex;
+    justify-content: flex-end;">
               <v-btn color="red" @click="buyPlayerModal = false">Cancel</v-btn>
               <v-btn type="submit" color="green">Save changes</v-btn>
             </v-card-actions>
@@ -322,6 +433,59 @@
 </template>
 
 <style lang="scss" scoped>
+.card-stat-name {
+  font-weight: 400;
+}
+.card-stat-value {
+  font-weight: bold;
+}
+.vertical-divisor {
+  height: 100%;
+  width: 1px;
+  top: 65%;
+  opacity: 0.8;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  background-color: #645215;
+}
+.card-name {
+  z-index: 2;
+  position: absolute;
+  top: 340px;
+  left: 125px;
+  width: 273px;
+}
+.card-stats-left {
+  position: absolute;
+  width: 50%;
+  bottom: 16px;
+  padding-left: 50px;
+  font-size: 20px;
+}
+.card-stats-right {
+  position: absolute;
+  width: 50%;
+  bottom: 16px;
+  right: 0;
+  padding-left: 20px;
+  font-size: 20px;
+}
+.card-stats {
+  z-index: 2;
+  position: absolute;
+  top: 385px;
+  left: 125px;
+  height: 102px;
+  width: 273px;
+}
+.card-left-info {
+  z-index: 2;
+  position: absolute;
+  display: grid;
+  left: 160px;
+  top: 143px;
+}
 .champzFont {
   font-size: 18px;
   font-weight: 500;

@@ -265,17 +265,18 @@
           <h5>BUY PLAYER</h5>
         </v-card-title>
         <v-card-text>
-          <div class="text-center player-card">
+          <div class="text-center" style="display: flex; justify-content: center; position: relative">
+            <div class="card-info">
             <div class="card-left-info">
               <span
-                style="margin-bottom: 10px; font-size: 40px; font-weight: bold"
+                style="margin-bottom: 10px; font-size: 40px; font-weight: bold; z-index: 2;"
                 >{{ currentPlayer.overall }}</span
               >
-              <span style="font-size: 25px">{{
+              <span style="font-size: 25px; z-index: 2;">{{
                 currentPlayer.specific_position
               }}</span>
               <img
-                style="width: 60px"
+                style="width: 60px; z-index: 2; margin: auto;"
                 :src="
                   gs.getNationImageLink(
                     getPlayerNation(currentPlayer.nation).image_link
@@ -283,7 +284,7 @@
                 "
               />
               <img
-                style="width: 60px"
+                style="width: 60px; z-index: 2; margin: auto"
                 :src="
                   gs.getTeamImageLink(
                     getPlayerTeam(currentPlayer.team_origin).image_link
@@ -294,11 +295,11 @@
             <img
               :src="gs.getPlayerImageLink(currentPlayer.image_link)"
               style="
-                max-height: 160px;
-                z-index: 2;
-                position: absolute;
-                top: 176px;
-                left: 235px;
+                    max-height: 160px;
+    z-index: 2;
+    position: absolute;
+    top: 100px;
+    left: -28px;
               "
             />
             <div class="card-name">
@@ -348,6 +349,7 @@
                   ><span class="mr-1 card-stat-name">PHY</span>
                 </v-row>
               </div>
+            </div>
             </div>
             <img
               src="../../../assets/gold.png"
@@ -433,6 +435,9 @@
 </template>
 
 <style lang="scss" scoped>
+.card-info {
+  position: absolute;
+}
 .card-stat-name {
   font-weight: 400;
 }
@@ -452,8 +457,8 @@
 .card-name {
   z-index: 2;
   position: absolute;
-  top: 340px;
-  left: 125px;
+  top: 261px;
+  left: -137px;
   width: 273px;
 }
 .card-stats-left {
@@ -474,17 +479,16 @@
 .card-stats {
   z-index: 2;
   position: absolute;
-  top: 385px;
-  left: 125px;
+  top: 300px;
+  left: -136px;
   height: 102px;
   width: 273px;
 }
-.card-left-info {
+.card-left-info {    
   z-index: 2;
-  position: absolute;
-  display: grid;
-  left: 160px;
-  top: 143px;
+    display: grid;
+    margin-left: -120px;
+    margin-top: 63px;
 }
 .champzFont {
   font-size: 18px;

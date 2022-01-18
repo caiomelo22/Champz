@@ -3,5 +3,9 @@
 /Back/champz
 /Back/matches
 /Back/transfers
-/Back/teams
-/Back/players
+/Back/ChampzWeb/wwwroot/teams
+/Back/ChampzWeb/wwwroot/players
+/Back/ChampzWeb/wwwroot/Nations
+/Back/ChampzWeb/__pycache__
+/Back/WebApp/__pycache__
+*.pyc

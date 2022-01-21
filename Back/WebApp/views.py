@@ -263,19 +263,29 @@ class CreateMatchesView(APIView):
 
         return Response(matches)
 
-class StartGroupView(APIView):
-    def post(self,request):
+class StartChampzView(APIView):
+    def chunks(self, lst, n):
+        """Yield successive n-sized chunks from lst."""
+        for i in range(0, len(lst), n):
+            yield lst[i:i + n]
+    def post(self, request, groupsQuantity):
         groups = Group.objects.all()
         for group in groups:
             group.delete()
-        
-        participants = Participant.objects.all()
-        group = Group.create('Group 1')
-        for participant in participants:
-            team = Team.objects.get(participant=participant)
-            group.addTeam(team)
-        
-        matches = group.createMatches()
+
+        matches = []
+
+        participants = list(Participant.objects.all())
+
+        participant_groups = self.chunks(participants, int(len(participants)/groupsQuantity))
+
+        for i, group_participants in enumerate(participant_groups):
+            group = Group.create('Group {}'.format(i+1))
+            for participant in group_participants:
+                team = Team.objects.get(participant=participant)
+                group.addTeam(team)
+            
+            matches.extend(group.createMatches())
 
         file = open("matches.txt", "w")
 

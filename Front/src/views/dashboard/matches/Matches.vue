@@ -502,7 +502,7 @@ export default {
     initializeGroup: function () {
       this.loading = true;
       this.service
-        .postRequest("/api/start_group/")
+        .postRequest("/api/start-champz/1")
         .then((response) => {
           this.getGroups();
           this.resetConfirmationModal = false;

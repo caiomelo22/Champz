@@ -513,7 +513,7 @@ class GenerateSemiFinalsRoundView(APIView):
         if len(old_stage) > 0:
             old_stage = old_stage[0]
             old_stage.delete()
-
+ 
         semis = Group.create('Semis')
         
         if len(group_stage) == 1:
@@ -638,7 +638,7 @@ class GenerateFinalView(APIView):
 
 class TransfersView(APIView):
     def get(self, request):
-        file = open("transfers.txt", "w")
+        file = open("transfers.txt", "w", encoding="utf-8")
         leagues = League.objects.all().order_by('name')
         team_participant = None
         for league in leagues:

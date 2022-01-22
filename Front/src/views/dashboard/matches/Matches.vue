@@ -38,8 +38,11 @@
           <v-col v-if="currentGroupIndex == 0" cols="12" md="8">
             <v-row>
               <v-col cols="12" md="11">
+                <div
+                  v-for="(table, index) in tables"
+                  :key="index">
+                  <h4 class="text-center my-6">{{ groups[index].group }}</h4>
                 <table
-                  v-if="currentGroupIndex == 0"
                   class="table table-striped ml-7"
                 >
                   <!-- <template v-slot:default> -->
@@ -58,7 +61,15 @@
                   <tbody>
                     <tr v-for="(team, i) in table" :key="i">
                       <td class="champzFont">
-                        <!-- <img style="width:30px;" :src="team[0].image_link" /> -->
+                    <img
+                      style="width: 30px"
+                      :src="
+                        gs.getTeamImageLink(
+                          getTeamById(team[0].id)
+                            .image_link
+                        )
+                      "
+                    />
                         {{
                           getTeamParticipant(
                             team[0].participant
@@ -76,6 +87,8 @@
                   </tbody>
                   <!-- </template> -->
                 </table>
+                <v-divider></v-divider>
+                </div>
               </v-col>
               <v-col cols="12" md="1" class="champzDivider">
                 <v-divider class="ml-8" vertical></v-divider>
@@ -87,11 +100,9 @@
             :md="currentGroupIndex ? 12 : 4"
             :class="currentGroupIndex ? 'champzKnockout' : 'champzMatches'"
           >
-            <div v-for="group in get_dashboard_matches()" :key="group.id">
-              <v-row class="mx-6">
-                <h3>{{ group.group }}</h3>
-              </v-row>
-              <v-simple-table :class="currentGroupIndex ? 'mx-8' : 'mr-12'">
+            <div v-for="group in get_dashboard_matches()" :key="group.id" class="mt-3">
+                <h5 class="text-center">{{ group.group }}</h5>
+              <v-simple-table :class="currentGroupIndex ? 'mx-8' : 'mr-0'">
                 <template v-slot:default>
                   <thead class="thead-dark">
                     <tr>
@@ -113,12 +124,27 @@
                             getTeamById(match.team_1).participant
                           ).name.toUpperCase()
                         }}
-                        <!-- <img
-                style="width:30px;"
-                :src="getTeamById(match.team_1).image_link"
-                      />-->
+                        
+                    <img
+                      style="width: 30px"
+                      :src="
+                        gs.getTeamImageLink(
+                          getTeamById(match.team_2)
+                            .image_link
+                        )
+                      "
+                    />
                         X
                         <!-- <img style="width:30px;" :src="getTeamById(match.team_2).image_link" /> -->
+                    <img
+                      style="width: 30px"
+                      :src="
+                        gs.getTeamImageLink(
+                          getTeamById(match.team_1)
+                            .image_link
+                        )
+                      "
+                    />
                         {{
                           getTeamParticipant(
                             getTeamById(match.team_2).participant
@@ -131,6 +157,15 @@
                             getTeamById(match.team_1).participant
                           ).name.toUpperCase()
                         }}
+                    <img
+                      style="width: 30px"
+                      :src="
+                        gs.getTeamImageLink(
+                          getTeamById(match.team_1)
+                            .image_link
+                        )
+                      "
+                    />
                         <!-- <img
                 style="width:30px;"
                 :src="getTeamById(match.team_1).image_link"
@@ -141,6 +176,15 @@
                 style="width:30px;"
                 :src="getTeamById(match.team_2).image_link"
                       />-->
+                    <img
+                      style="width: 30px"
+                      :src="
+                        gs.getTeamImageLink(
+                          getTeamById(match.team_2)
+                            .image_link
+                        )
+                      "
+                    />
                         {{
                           getTeamParticipant(
                             getTeamById(match.team_2).participant
@@ -161,6 +205,7 @@
                   </tbody>
                 </template>
               </v-simple-table>
+                <v-divider></v-divider>
             </div>
           </v-col>
         </v-row>
@@ -287,10 +332,14 @@
 </template>
 
 <style lang="scss" scoped>
+// tr {
+//   height: 35px !important;
+// }
 .champzFont {
   font-size: 15px;
   font-weight: 500;
   font-family: system-ui;
+  vertical-align: inherit !important;
 }
 
 .table {
@@ -304,18 +353,20 @@
   height: 100%;
 }
 .champzMatches {
-  height: 67vh;
+  height: 100%;
   overflow-y: auto;
 }
 </style>
 
 <script>
 import Service from "@/services/Service";
+import GeneralServices from "@/services/GeneralServices";
 export default {
   name: "Matches",
 
   data: () => ({
     service: new Service(),
+    gs: new GeneralServices(),
     loading: true,
     choice: false,
     final: false,
@@ -327,6 +378,7 @@ export default {
     groups: [],
     matches: [],
     table: [],
+    tables: [],
     currentMatch: {},
     currentGroupIndex: 0,
     currentGroup: {},
@@ -340,13 +392,13 @@ export default {
   methods: {
     get_dashboard_matches() {
       if (this.currentGroupIndex == 0) {
-        return [this.groups[0]];
+        return this.groups.filter((x) => x.group.includes("Group"));
       } else if (this.currentGroupIndex == 1) {
-        return [this.groups[1]];
+        return this.groups.filter((x) => x.group.includes("Wildcard"));
       } else if (this.currentGroupIndex == 2) {
-        return this.groups.slice(2, 4);
+        return this.groups.filter((x) => x.group.includes("Semi"));
       } else if (this.currentGroupIndex == 3) {
-        return this.groups.slice(4, 6);
+        return this.groups.filter((x) => x.group.includes("Final"));
       }
     },
     next_stage_click() {
@@ -454,12 +506,12 @@ export default {
         .indexOf(this.currentMatch.id);
       this.groups[groupIndex].matches[matchIndex] = this.currentMatch;
       var url = "/api/match/" + this.currentMatch.id + "/";
-          this.registerScoreModal = false;
+      this.registerScoreModal = false;
       this.service
         .patchRequest(url, this.currentMatch)
         .then((response) => {
           if (this.currentGroupIndex == 0) {
-            this.getGroupTable();
+            this.getGroupsTable();
           }
         })
         .catch((err) => {
@@ -479,7 +531,7 @@ export default {
               element.matches = [];
             });
             this.getMatches();
-            this.getGroupTable();
+            this.getGroupsTable();
           }
         })
         .catch((err) => {
@@ -487,11 +539,11 @@ export default {
           console.log(err);
         });
     },
-    getGroupTable: function () {
+    getGroupsTable: function () {
       this.service
-        .getRequest("/api/table/" + this.groups[0].id)
+        .getRequest("/api/tables/")
         .then((response) => {
-          this.table = response;
+          this.tables = response;
           this.loading = false;
         })
         .catch((err) => {
@@ -502,7 +554,7 @@ export default {
     initializeGroup: function () {
       this.loading = true;
       this.service
-        .postRequest("/api/start-champz/1")
+        .postRequest("/api/start-champz/2")
         .then((response) => {
           this.getGroups();
           this.resetConfirmationModal = false;
@@ -513,7 +565,7 @@ export default {
         });
     },
     knockoutStageButtonClick: function () {
-      if (this.groups.length > 1) {
+      if (this.groups.filter(x => x.group.includes('Wildcard')).length > 1) {
         this.currentGroupIndex += 1;
       } else {
         this.loading = true;
@@ -534,12 +586,12 @@ export default {
     nextKnockoutStageButtonClick: function () {
       if (
         this.currentGroupIndex == 1 &&
-        this.currentGroupIndex + 1 == this.groups.length
+        this.groups.filter(x => x.group.includes('Semi')).length == 0
       ) {
         this.generateSemis();
       } else if (
         this.currentGroupIndex == 2 &&
-        this.currentGroupIndex + 2 == this.groups.length
+        this.groups.filter(x => x.group.includes('Final')).length == 0
       ) {
         this.generateFinal();
       } else {

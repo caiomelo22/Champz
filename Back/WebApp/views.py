@@ -334,6 +334,27 @@ class GetGroupTableView(APIView):
                 (TeamSerializer(participant[0]).data, participant[1]))
         return JsonResponse(new_table, safe=False)
 
+class GetGroupsTableView(APIView):
+    def get(self, request):
+        groups = list(Group.objects.all())
+        groups = [g for g in groups if 'Group' in g.group]
+        if len(groups) == 0:
+            return HttpResponseNotFound("No groups found.")
+        
+        tables = []
+
+        for group in groups:
+            table = group.getGroupTable()
+            tables.append([])
+
+            dic = dict()
+
+            for participant in table:
+                dic[participant[0].id] = participant[1]
+                tables[-1].append(
+                    (TeamSerializer(participant[0]).data, participant[1]))
+        return JsonResponse(tables, safe=False)
+
 
 class RegisterScoreView(APIView):
     def post(self, request, id):
@@ -413,6 +434,8 @@ class GenerateWildcardKnockoutRoundView(APIView):
             old_stage = old_stage[0]
             old_stage.delete()
 
+        groups = [g for g in groups if 'Group' in g.group]
+
         if len(groups) == 1:
             tableWildcard = groups[0].getGroupTable()[2:6]
             wildcard = Group.create('Wildcard')
@@ -422,11 +445,25 @@ class GenerateWildcardKnockoutRoundView(APIView):
 
             matchesWildcard.append(Match.create(wildcard, tableWildcard[0][0], tableWildcard[3][0]))
             matchesWildcard.append(Match.create(wildcard, tableWildcard[1][0], tableWildcard[2][0]))
+            
+            wildcard.save()
+
+        elif len(groups) == 2:
+            print(groups)
+            for i in range(2):
+                tableWildcard = groups[i].getGroupTable()[1:3]
+                wildcard = Group.create('Wildcard {}'.format(i+1))
+
+                for team in tableWildcard:
+                    wildcard.addTeam(team[0])
+
+                matchesWildcard.append(Match.create(wildcard, tableWildcard[0][0], tableWildcard[1][0]))
+                
+                wildcard.save()
 
         else:
             return HttpResponseBadRequest("Number of groups does not allow the generation of a knockout round.")
 
-        wildcard.save()
 
         matchesWildcard = MatchSerializer(matchesWildcard, many=True)
 
@@ -461,10 +498,11 @@ class GenerateSemiFinalsRoundView(APIView):
 
     def post(self, request):
         groups = list(Group.objects.all())
-        table_group_stage = groups[0].getGroupTable()
+        group_stage = [g for g in groups if 'Group' in g.group]
+        wildcard_stage = [g for g in groups if 'Wildcard' in g.group]
 
         matchesSemi = []
-        matchesInteriorSemi = []
+        # matchesInteriorSemi = []
 
         old_stage = Group.objects.filter(group='Semis')
         if len(old_stage) > 0:
@@ -476,44 +514,64 @@ class GenerateSemiFinalsRoundView(APIView):
             old_stage = old_stage[0]
             old_stage.delete()
 
-        table_wildcard = groups[1].getGroupTable()
         semis = Group.create('Semis')
+        
+        if len(group_stage) == 1:
+            table_group_stage = group_stage[0].getGroupTable()
+            table_wildcard = wildcard_stage[0].getGroupTable()
 
-        wildcard_winners = self.get_group_winners('Wildcard', table_wildcard, table_group_stage)
+            wildcard_winners = self.get_group_winners('Wildcard', table_wildcard, table_group_stage)
 
-        semis.addTeam(table_group_stage[0][0])
-        semis.addTeam(table_group_stage[1][0])
-        semis.addTeam(wildcard_winners[0])
-        semis.addTeam(wildcard_winners[1])
+            semis.addTeam(table_group_stage[0][0])
+            semis.addTeam(table_group_stage[1][0])
+            semis.addTeam(wildcard_winners[0])
+            semis.addTeam(wildcard_winners[1])
 
-        wc1_position = self.checkPositionGroupStage(wildcard_winners[0], table_group_stage)
-        wc2_position = self.checkPositionGroupStage(wildcard_winners[1], table_group_stage)
+            wc1_position = self.checkPositionGroupStage(wildcard_winners[0], table_group_stage)
+            wc2_position = self.checkPositionGroupStage(wildcard_winners[1], table_group_stage)
 
-        if wc1_position < wc2_position:
-            matchesSemi.append(Match.create(semis, table_group_stage[0][0], wildcard_winners[1]))
-            matchesSemi.append(Match.create(semis,  wildcard_winners[1], table_group_stage[0][0]))
-            matchesSemi.append(Match.create(semis, table_group_stage[1][0], wildcard_winners[0]))
-            matchesSemi.append(Match.create(semis, wildcard_winners[0], table_group_stage[1][0]))
-        else:
-            matchesSemi.append(Match.create(semis, table_group_stage[0][0], wildcard_winners[0]))
-            matchesSemi.append(Match.create(semis, wildcard_winners[0], table_group_stage[0][0]))
-            matchesSemi.append(Match.create(semis, table_group_stage[1][0], wildcard_winners[1]))
-            matchesSemi.append(Match.create(semis, wildcard_winners[1], table_group_stage[1][0]))
+            if wc1_position < wc2_position:
+                matchesSemi.append(Match.create(semis, table_group_stage[0][0], wildcard_winners[1]))
+                matchesSemi.append(Match.create(semis,  wildcard_winners[1], table_group_stage[0][0]))
+                matchesSemi.append(Match.create(semis, table_group_stage[1][0], wildcard_winners[0]))
+                matchesSemi.append(Match.create(semis, wildcard_winners[0], table_group_stage[1][0]))
+            else:
+                matchesSemi.append(Match.create(semis, table_group_stage[0][0], wildcard_winners[0]))
+                matchesSemi.append(Match.create(semis, wildcard_winners[0], table_group_stage[0][0]))
+                matchesSemi.append(Match.create(semis, table_group_stage[1][0], wildcard_winners[1]))
+                matchesSemi.append(Match.create(semis, wildcard_winners[1], table_group_stage[1][0]))
+
+        if len(group_stage) == 2:
+            qualified = []
+            for i in range(2):
+                table_group_stage = group_stage[i].getGroupTable()
+                table_wildcard = wildcard_stage[i].getGroupTable()
+
+                wildcard_winners = self.get_group_winners('Wildcard {}'.format(i+1), table_wildcard, table_group_stage)
+                qualified.append(table_group_stage[0][0])
+                qualified.append(wildcard_winners[0])
+                semis.addTeam(table_group_stage[0][0])
+                semis.addTeam(wildcard_winners[0])
+                
+            matchesSemi.append(Match.create(semis, qualified[0], qualified[3]))
+            matchesSemi.append(Match.create(semis, qualified[3], qualified[0]))
+            matchesSemi.append(Match.create(semis, qualified[2], qualified[1]))
+            matchesSemi.append(Match.create(semis, qualified[1], qualified[2]))
 
         semis.save()
 
-        tableInterior = table_group_stage[6:]
-        interior = Group.create('Interior Semis')
+        # tableInterior = table_group_stage[6:]
+        # interior = Group.create('Interior Semis')
 
-        for team in tableInterior:
-            interior.addTeam(team[0])
+        # for team in tableInterior:
+        #     interior.addTeam(team[0])
 
-        matchesInteriorSemi.append(Match.create(interior, tableInterior[0][0], tableInterior[3][0]))
-        matchesInteriorSemi.append(Match.create(interior, tableInterior[1][0], tableInterior[2][0]))
+        # matchesInteriorSemi.append(Match.create(interior, tableInterior[0][0], tableInterior[3][0]))
+        # matchesInteriorSemi.append(Match.create(interior, tableInterior[1][0], tableInterior[2][0]))
 
-        interior.save()
+        # interior.save()
 
-        matchesInteriorSemi = MatchSerializer(matchesInteriorSemi, many=True)
+        # matchesInteriorSemi = MatchSerializer(matchesInteriorSemi, many=True)
 
         matchesSemi = MatchSerializer(matchesSemi, many=True)
 
@@ -557,21 +615,21 @@ class GenerateFinalView(APIView):
 
         groups = list(Group.objects.all())
 
-        semis = groups[-2]
+        semis = [g for g in groups if 'Semi' in g.group][0]
 
         finalMatch = semis.generateFinalRound()
 
-        table_group_stage = groups[0].getGroupTable()
+        # table_group_stage = groups[0].getGroupTable()
 
-        table_interior_semis = groups[3].getGroupTable()
-        interiorFinal = Group.create('Interior Final')
+        # table_interior_semis = groups[3].getGroupTable()
+        # interiorFinal = Group.create('Interior Final')
 
-        interiorSemisWinners = self.get_interior_winners('Interior Semis', table_interior_semis, table_group_stage)
+        # interiorSemisWinners = self.get_interior_winners('Interior Semis', table_interior_semis, table_group_stage)
 
-        for team in interiorSemisWinners:
-            interiorFinal.addTeam(team)
+        # for team in interiorSemisWinners:
+        #     interiorFinal.addTeam(team)
 
-        Match.create(interiorFinal, interiorSemisWinners[0], interiorSemisWinners[1])
+        # Match.create(interiorFinal, interiorSemisWinners[0], interiorSemisWinners[1])
 
         finalMatch = MatchSerializer(finalMatch, many=True)
 
@@ -648,7 +706,7 @@ class ParticipantsTeamsView(APIView):
 
 class EndChampzView(APIView):
     def post(self, request):
-        file = open("champz.txt", "w")
+        file = open("champz.txt", "w", encoding="utf-8")
         participants = Participant.objects.all()
         file.write("TEAMS: \n\n")
         for participant in participants:
@@ -660,20 +718,24 @@ class EndChampzView(APIView):
             for player in players_participant:
                 strBuilder += '\t{} - {} - ${}\n'.format(player.name, player.overall, player.value)
             strBuilder += '\n'
+            print(strBuilder)
             file.write(strBuilder)
 
-        groups = Group.objects.all()
-        table = groups[0].getGroupTable()
+        groups = list(Group.objects.all())
+        group_stage = [g for g in groups if 'Group' in g.group]
 
-        file.write('GROUP STAGE TABLE\n\n')
-        file.write('TEAM\t\tP\tW\tD\tL\tGF\tGA\tGD\n')
-        for el in table:
-            team = Team.objects.get(name=el[0])
-            if len(team.participant.name) > 8:
-                file.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(team.participant.name, el[1]['P'], el[1]['W'], el[1]['D'], el[1]['L'], el[1]['GF'], el[1]['GA'], el[1]['GD']))
-            else:
-                file.write('{}\t\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(team.participant.name, el[1]['P'], el[1]['W'], el[1]['D'], el[1]['L'], el[1]['GF'], el[1]['GA'], el[1]['GD']))
-        file.write('\n')
+        for index, group in enumerate(group_stage):
+            table = group.getGroupTable()
+
+            file.write('GROUP {} TABLE\n\n'.format(index+1))
+            file.write('TEAM\t\tP\tW\tD\tL\tGF\tGA\tGD\n')
+            for el in table:
+                team = Team.objects.get(name=el[0])
+                if len(team.participant.name) > 8:
+                    file.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(team.participant.name, el[1]['P'], el[1]['W'], el[1]['D'], el[1]['L'], el[1]['GF'], el[1]['GA'], el[1]['GD']))
+                else:
+                    file.write('{}\t\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(team.participant.name, el[1]['P'], el[1]['W'], el[1]['D'], el[1]['L'], el[1]['GF'], el[1]['GA'], el[1]['GD']))
+            file.write('\n')
 
 
         file.write('MATCHES: \n\n')

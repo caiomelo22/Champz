@@ -38,56 +38,51 @@
           <v-col v-if="currentGroupIndex == 0" cols="12" md="8">
             <v-row>
               <v-col cols="12" md="11">
-                <div
-                  v-for="(table, index) in tables"
-                  :key="index">
+                <div v-for="(table, index) in tables" :key="index">
                   <h4 class="text-center my-6">{{ groups[index].group }}</h4>
-                <table
-                  class="table table-striped ml-7"
-                >
-                  <!-- <template v-slot:default> -->
-                  <thead>
-                    <tr>
-                      <th class="champzFont" scope="col">Team</th>
-                      <th class="champzFont" scope="col">P</th>
-                      <th class="champzFont" scope="col">W</th>
-                      <th class="champzFont" scope="col">D</th>
-                      <th class="champzFont" scope="col">L</th>
-                      <th class="champzFont" scope="col">GF</th>
-                      <th class="champzFont" scope="col">GA</th>
-                      <th class="champzFont" scope="col">GD</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(team, i) in table" :key="i">
-                      <td class="champzFont">
-                    <img
-                      style="width: 30px"
-                      :src="
-                        gs.getTeamImageLink(
-                          getTeamById(team[0].id)
-                            .image_link
-                        )
-                      "
-                    />
-                        {{
-                          getTeamParticipant(
-                            team[0].participant
-                          ).name.toUpperCase()
-                        }}
-                      </td>
-                      <td class="champzFont">{{ team[1].P }}</td>
-                      <td class="champzFont">{{ team[1].W }}</td>
-                      <td class="champzFont">{{ team[1].D }}</td>
-                      <td class="champzFont">{{ team[1].L }}</td>
-                      <td class="champzFont">{{ team[1].GF }}</td>
-                      <td class="champzFont">{{ team[1].GA }}</td>
-                      <td class="champzFont">{{ team[1].GD }}</td>
-                    </tr>
-                  </tbody>
-                  <!-- </template> -->
-                </table>
-                <v-divider></v-divider>
+                  <table class="table table-striped ml-7">
+                    <!-- <template v-slot:default> -->
+                    <thead>
+                      <tr>
+                        <th class="champzFont" scope="col">Team</th>
+                        <th class="champzFont" scope="col">P</th>
+                        <th class="champzFont" scope="col">W</th>
+                        <th class="champzFont" scope="col">D</th>
+                        <th class="champzFont" scope="col">L</th>
+                        <th class="champzFont" scope="col">GF</th>
+                        <th class="champzFont" scope="col">GA</th>
+                        <th class="champzFont" scope="col">GD</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(team, i) in table" :key="i">
+                        <td class="champzFont">
+                          <img
+                            style="width: 30px"
+                            :src="
+                              gs.getTeamImageLink(
+                                getTeamById(team[0].id).image_link
+                              )
+                            "
+                          />
+                          {{
+                            getTeamParticipant(
+                              team[0].participant
+                            ).name.toUpperCase()
+                          }}
+                        </td>
+                        <td class="champzFont">{{ team[1].P }}</td>
+                        <td class="champzFont">{{ team[1].W }}</td>
+                        <td class="champzFont">{{ team[1].D }}</td>
+                        <td class="champzFont">{{ team[1].L }}</td>
+                        <td class="champzFont">{{ team[1].GF }}</td>
+                        <td class="champzFont">{{ team[1].GA }}</td>
+                        <td class="champzFont">{{ team[1].GD }}</td>
+                      </tr>
+                    </tbody>
+                    <!-- </template> -->
+                  </table>
+                  <v-divider></v-divider>
                 </div>
               </v-col>
               <v-col cols="12" md="1" class="champzDivider">
@@ -100,8 +95,12 @@
             :md="currentGroupIndex ? 12 : 4"
             :class="currentGroupIndex ? 'champzKnockout' : 'champzMatches'"
           >
-            <div v-for="group in get_dashboard_matches()" :key="group.id" class="mt-3">
-                <h5 class="text-center">{{ group.group }}</h5>
+            <div
+              v-for="group in get_dashboard_matches()"
+              :key="group.id"
+              class="mt-3"
+            >
+              <h5 class="text-center">{{ group.group }}</h5>
               <v-simple-table :class="currentGroupIndex ? 'mx-8' : 'mr-0'">
                 <template v-slot:default>
                   <thead class="thead-dark">
@@ -124,27 +123,25 @@
                             getTeamById(match.team_1).participant
                           ).name.toUpperCase()
                         }}
-                        
-                    <img
-                      style="width: 30px"
-                      :src="
-                        gs.getTeamImageLink(
-                          getTeamById(match.team_2)
-                            .image_link
-                        )
-                      "
-                    />
+
+                        <img
+                          style="width: 30px"
+                          :src="
+                            gs.getTeamImageLink(
+                              getTeamById(match.team_1).image_link
+                            )
+                          "
+                        />
                         X
                         <!-- <img style="width:30px;" :src="getTeamById(match.team_2).image_link" /> -->
-                    <img
-                      style="width: 30px"
-                      :src="
-                        gs.getTeamImageLink(
-                          getTeamById(match.team_1)
-                            .image_link
-                        )
-                      "
-                    />
+                        <img
+                          style="width: 30px"
+                          :src="
+                            gs.getTeamImageLink(
+                              getTeamById(match.team_2).image_link
+                            )
+                          "
+                        />
                         {{
                           getTeamParticipant(
                             getTeamById(match.team_2).participant
@@ -157,15 +154,14 @@
                             getTeamById(match.team_1).participant
                           ).name.toUpperCase()
                         }}
-                    <img
-                      style="width: 30px"
-                      :src="
-                        gs.getTeamImageLink(
-                          getTeamById(match.team_1)
-                            .image_link
-                        )
-                      "
-                    />
+                        <img
+                          style="width: 30px"
+                          :src="
+                            gs.getTeamImageLink(
+                              getTeamById(match.team_1).image_link
+                            )
+                          "
+                        />
                         <!-- <img
                 style="width:30px;"
                 :src="getTeamById(match.team_1).image_link"
@@ -176,15 +172,14 @@
                 style="width:30px;"
                 :src="getTeamById(match.team_2).image_link"
                       />-->
-                    <img
-                      style="width: 30px"
-                      :src="
-                        gs.getTeamImageLink(
-                          getTeamById(match.team_2)
-                            .image_link
-                        )
-                      "
-                    />
+                        <img
+                          style="width: 30px"
+                          :src="
+                            gs.getTeamImageLink(
+                              getTeamById(match.team_2).image_link
+                            )
+                          "
+                        />
                         {{
                           getTeamParticipant(
                             getTeamById(match.team_2).participant
@@ -205,7 +200,7 @@
                   </tbody>
                 </template>
               </v-simple-table>
-                <v-divider></v-divider>
+              <v-divider></v-divider>
             </div>
           </v-col>
         </v-row>
@@ -565,7 +560,7 @@ export default {
         });
     },
     knockoutStageButtonClick: function () {
-      if (this.groups.filter(x => x.group.includes('Wildcard')).length > 1) {
+      if (this.groups.filter((x) => x.group.includes("Wildcard")).length > 1) {
         this.currentGroupIndex += 1;
       } else {
         this.loading = true;
@@ -586,12 +581,12 @@ export default {
     nextKnockoutStageButtonClick: function () {
       if (
         this.currentGroupIndex == 1 &&
-        this.groups.filter(x => x.group.includes('Semi')).length == 0
+        this.groups.filter((x) => x.group.includes("Semi")).length == 0
       ) {
         this.generateSemis();
       } else if (
         this.currentGroupIndex == 2 &&
-        this.groups.filter(x => x.group.includes('Final')).length == 0
+        this.groups.filter((x) => x.group.includes("Final")).length == 0
       ) {
         this.generateFinal();
       } else {

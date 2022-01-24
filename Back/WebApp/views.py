@@ -313,6 +313,49 @@ class StartChampzView(APIView):
 
         return Response(matches)
 
+class RedoGroupsMatchesView(APIView):
+    def post(self, request):
+        groups = list(Group.objects.all())
+        matches = Match.objects.all()
+        for match in matches:
+            match.delete()
+
+        matches = []
+
+        group1 = list(groups[0].teams.all())
+        group2 = list(groups[1].teams.all())
+        for i in range(len(group1)):
+            for j in range(len(group2)):
+                team_1 = Team.objects.filter(id=group1[i].id)[0]
+                team_2 = Team.objects.filter(id=group2[j].id)[0]
+                matches.append(Match.create(groups[0], team_1, team_2))
+
+        file = open("matches.txt", "w")
+
+        file.write('MATCHES: \n\n')
+
+        strBuilder = ""
+        # strBuilder += '{}\n'.format(group.group.upper())
+        for match in matches:
+            team_1 = match.team_1.participant.name
+            team_2 = match.team_2.participant.name
+            goals_1 = match.goals_team_1
+            print(goals_1, type(goals_1))
+            if goals_1 is None:
+                goals_1 = ''
+            goals_2 = match.goals_team_2
+            if goals_2 is None:
+                goals_2 = ''
+            strBuilder += '\t{} {} x {} {}\n'.format(team_1, goals_1, goals_2, team_2)
+        strBuilder += '\n'
+        file.write(strBuilder)
+
+        file.close()
+
+        matches = MatchSerializer(matches, many=True).data
+
+        return Response(matches)
+
 class GetGroupTableView(APIView):
     def get(self, request, id):
         group = Group.objects.filter(id=id)
@@ -553,10 +596,10 @@ class GenerateSemiFinalsRoundView(APIView):
                 semis.addTeam(table_group_stage[0][0])
                 semis.addTeam(wildcard_winners[0])
                 
-            matchesSemi.append(Match.create(semis, qualified[0], qualified[3]))
-            matchesSemi.append(Match.create(semis, qualified[3], qualified[0]))
-            matchesSemi.append(Match.create(semis, qualified[2], qualified[1]))
-            matchesSemi.append(Match.create(semis, qualified[1], qualified[2]))
+            matchesSemi.append(Match.create(semis, qualified[0], qualified[1]))
+            matchesSemi.append(Match.create(semis, qualified[1], qualified[0]))
+            matchesSemi.append(Match.create(semis, qualified[2], qualified[3]))
+            matchesSemi.append(Match.create(semis, qualified[3], qualified[2]))
 
         semis.save()
 

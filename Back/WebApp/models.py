@@ -218,10 +218,14 @@ class Group(models.Model):
 
     def getStatsTeam(self, team):
         stats = {'P': 0, 'W': 0, 'D': 0, 'L': 0, 'GF': 0, 'GA': 0, 'GD': 0}
-        matches = list(Match.objects.filter(team_1=team, group=self))
+        group = self
+        if 'Group' in self.group:
+            groups = list(Group.objects.all())
+            group = ([g for g in groups if ('Group' in g.group and len(list(g.teams.all())) > 0)])[0]
+        matches = list(Match.objects.filter(team_1=team, group=group))
         stats = self.getStats(stats, matches, team)
 
-        matches = list(Match.objects.filter(team_2=team, group=self))
+        matches = list(Match.objects.filter(team_2=team, group=group))
         stats = self.getStats(stats, matches, team)
 
         return stats

@@ -28,7 +28,7 @@ class NationViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = dict(request.data)
-        nation = Nation.create(data['name'], data['image_link'])
+        nation = Nation.create(data['name'], data['image_path'])
         nation = NationSerializer(nation, context={'request': request})
         return Response(nation.data)
 
@@ -38,7 +38,6 @@ class LeagueViewSet(viewsets.ModelViewSet):
     serializer_class = LeagueSerializer
 
     def create(self, request, *args, **kwargs):
-        print(request.data)
         data = dict(request.data)
         league = League.create(data['name'])
         league = LeagueSerializer(league, context={'request': request})
@@ -117,7 +116,7 @@ class TeamViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         data = dict(request.data)
         league = League.objects.get(id=int(data['league']))
-        team = Team.create(data['name'], league, data['image_link'])
+        team = Team.create(data['name'], league, data['image_path'])
         team = TeamSerializer(team, context={'request': request})
         return Response(team.data)
 
@@ -145,7 +144,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
         team_origin = Team.objects.get(id=int(data['team_origin']))
         nation = Nation.objects.get(id=int(data['nation']))
         player = Player.create(data['name'], int(
-            data['overall']), position, team_origin, nation, data['image_link'], data['specific_position'])
+            data['overall']), position, team_origin, nation, data['image_path'], data['specific_position'])
         player = PlayerSerializer(player, context={'request': request})
         return Response(player.data)
 
@@ -154,11 +153,9 @@ class PlayerViewSet(viewsets.ModelViewSet):
         if 'team_participant' in request._request.__dict__['environ']['QUERY_STRING']:
             team_participant = request._request.__dict__['environ']['QUERY_STRING'].split('=')[1]
             players = [player for player in players if str(player.team_participant_id)==team_participant]
-            print(players)
         if 'position' in request._request.__dict__['environ']['QUERY_STRING']:
             position = request._request.__dict__['environ']['QUERY_STRING'].split('=')[1]
             position_obj = Position.objects.filter(id=position)[0]
-            print(position_obj.specific_positions.split(';'))
             players = [player for player in players if player.specific_position in position_obj.specific_positions.split(';')]
         players.sort(key=lambda item: (item.overall, item.pace), reverse=True)
         return Response(PlayerSerializer(players, many=True).data)
@@ -199,10 +196,9 @@ class BuyPlayerView(APIView):
 
         data = dict(request.data)
 
-        if data.get('team_participant') is None:
-            team = None
-            price = None
-        else:
+        team = None
+        price = None
+        if data.get('team_participant') is not None:
             team = Team.objects.filter(id=int(data['team_participant']))
             if len(team) == 0:
                 return HttpResponseNotFound("There are no teams with the given id.")
@@ -221,7 +217,6 @@ class BuyPlayerView(APIView):
 class AddTeamGroupView(APIView):
     def post(self, request, id):
         group = Group.objects.filter(id=id)
-        print(group)
         if len(group) == 0:
             return HttpResponseNotFound("There are no groups with the given id.")
         else:
@@ -244,20 +239,7 @@ class CreateMatchesView(APIView):
 
         matches = group.createMatches()
 
-        file = open("matches.txt", "w")
-
-        file.write('MATCHES: \n\n')
-
-        strBuilder = ""
-        strBuilder += '{}\n'.format(group.group.upper())
-        for match in matches:
-            team_1 = match.team_1.participant.name
-            team_2 = match.team_2.participant.name
-            strBuilder += '\t{} {} x {} {}\n'.format(team_1, match.goals_team_1, match.goals_team_2, team_2)
-        strBuilder += '\n'
-        file.write(strBuilder)
-
-        file.close()
+        group.export_matches()
 
         matches = MatchSerializer(matches, many=True).data
 
@@ -277,27 +259,7 @@ class StartGroupView(APIView):
         
         matches = group.createMatches()
 
-        file = open("matches.txt", "w")
-
-        file.write('MATCHES: \n\n')
-
-        strBuilder = ""
-        strBuilder += '{}\n'.format(group.group.upper())
-        for match in matches:
-            team_1 = match.team_1.participant.name
-            team_2 = match.team_2.participant.name
-            goals_1 = match.goals_team_1
-            print(goals_1, type(goals_1))
-            if goals_1 is None:
-                goals_1 = ''
-            goals_2 = match.goals_team_2
-            if goals_2 is None:
-                goals_2 = ''
-            strBuilder += '\t{} {} x {} {}\n'.format(team_1, goals_1, goals_2, team_2)
-        strBuilder += '\n'
-        file.write(strBuilder)
-
-        file.close()
+        group.export_matches()
 
         matches = MatchSerializer(matches, many=True).data
 
@@ -310,8 +272,6 @@ class GetGroupTableView(APIView):
             return HttpResponseNotFound("There are no groups with the given id.")
         else:
             group = group[0]
-
-        data = dict(request.data)
 
         table = group.getGroupTable()
         new_table = []
@@ -350,14 +310,14 @@ class RegisterScoreView(APIView):
 
 class GenerateFirstKnockoutRoundView(APIView):
     def post(self, request):
-        groups = list(Group.objects.all())
-
         matches = []
 
         old_stage = Group.objects.filter(group='Knockout 1')
         if len(old_stage) > 0:
             old_stage = old_stage[0]
             old_stage.delete()
+
+        groups = list(Group.objects.all())
 
         if len(groups) == 1:
             table = groups[0].getGroupTable()[:4]
@@ -368,21 +328,6 @@ class GenerateFirstKnockoutRoundView(APIView):
 
             matches.append(Match.create(knockout_1, table[0][0], table[3][0]))
             matches.append(Match.create(knockout_1, table[1][0], table[2][0]))
-
-        elif len(groups) == 2:
-            table_1 = groups[0].getGroupTable()[:2]
-            table_2 = groups[0].getGroupTable()[:2]
-            knockout_1 = Group.create('Knockout 1')
-
-            for i in range(len(table_1)):
-                knockout_1.addTeam(table_1[i][0])
-                knockout_1.addTeam(table_2[i][0])
-
-            matches.append(Match.create(
-                knockout_1, table_1[0][0], table_2[1][0]))
-            matches.append(Match.create(
-                knockout_1, table_2[0][0], table_1[1][0]))
-
         else:
             return HttpResponseBadRequest("Number of groups does not allow the generation of a knockout round.")
 
@@ -394,14 +339,14 @@ class GenerateFirstKnockoutRoundView(APIView):
 
 class GenerateWildcardKnockoutRoundView(APIView):
     def post(self, request):
-        groups = list(Group.objects.all())
-
         matchesWildcard = []
 
         old_stage = Group.objects.filter(group='Wildcard')
         if len(old_stage) > 0:
             old_stage = old_stage[0]
             old_stage.delete()
+
+        groups = list(Group.objects.all())
 
         if len(groups) == 1:
             tableWildcard = groups[0].getGroupTable()[2:6]
@@ -426,7 +371,6 @@ class GenerateWildcardKnockoutRoundView(APIView):
 class GenerateSemiFinalsRoundView(APIView):
     def checkPositionGroupStage(self, team, group_stage):
         for i, position in enumerate(group_stage):
-            print(position, i)
             if position[0] == team:
                 return i
         return -1
@@ -450,21 +394,15 @@ class GenerateSemiFinalsRoundView(APIView):
         return qualified
 
     def post(self, request):
-        groups = list(Group.objects.all())
-        table_group_stage = groups[0].getGroupTable()
-
         matchesSemi = []
-        matchesInteriorSemi = []
 
         old_stage = Group.objects.filter(group='Semis')
         if len(old_stage) > 0:
             old_stage = old_stage[0]
             old_stage.delete()
 
-        old_stage = Group.objects.filter(group='Interior Semis')
-        if len(old_stage) > 0:
-            old_stage = old_stage[0]
-            old_stage.delete()
+        groups = list(Group.objects.all())
+        table_group_stage = groups[0].getGroupTable()
 
         table_wildcard = groups[1].getGroupTable()
         semis = Group.create('Semis')
@@ -492,19 +430,6 @@ class GenerateSemiFinalsRoundView(APIView):
 
         semis.save()
 
-        tableInterior = table_group_stage[6:]
-        interior = Group.create('Interior Semis')
-
-        for team in tableInterior:
-            interior.addTeam(team[0])
-
-        matchesInteriorSemi.append(Match.create(interior, tableInterior[0][0], tableInterior[3][0]))
-        matchesInteriorSemi.append(Match.create(interior, tableInterior[1][0], tableInterior[2][0]))
-
-        interior.save()
-
-        matchesInteriorSemi = MatchSerializer(matchesInteriorSemi, many=True)
-
         matchesSemi = MatchSerializer(matchesSemi, many=True)
 
         return Response(matchesSemi.data)
@@ -517,51 +442,16 @@ class GenerateFinalView(APIView):
             if position[0] == team:
                 return i
         return -1
-    def get_interior_winners(self, group, teams, group_stage):
-        qualified = []
-        group = Group.objects.filter(group=group)[0]
-        for team in teams:
-            if team[1]['P'] == 3:
-                qualified.append(team[0])
-            elif team[1]['P'] == 1:
-                opponent = group.findMatchGroupParticipantOpponent(team[0])
-                position_team = self.checkPositionGroupStage(team[0], group_stage)
-                position_opponent = self.checkPositionGroupStage(opponent, group_stage)
-                if position_team < position_opponent:
-                    qualified.append(team[0])
-
-            if len(qualified) == 2:
-                break
-
-        return qualified
+        
     def post(self, request):
         old_stage = Group.objects.filter(group='Final')
         if len(old_stage) > 0:
             old_stage = old_stage[0]
             old_stage.delete()
 
-        old_stage = Group.objects.filter(group='Interior Final')
-        if len(old_stage) > 0:
-            old_stage = old_stage[0]
-            old_stage.delete()
-
-        groups = list(Group.objects.all())
-
-        semis = groups[-2]
+        semis = list(Group.objects.filter(group='Semis'))[0]
 
         finalMatch = semis.generateFinalRound()
-
-        table_group_stage = groups[0].getGroupTable()
-
-        table_interior_semis = groups[3].getGroupTable()
-        interiorFinal = Group.create('Interior Final')
-
-        interiorSemisWinners = self.get_interior_winners('Interior Semis', table_interior_semis, table_group_stage)
-
-        for team in interiorSemisWinners:
-            interiorFinal.addTeam(team)
-
-        Match.create(interiorFinal, interiorSemisWinners[0], interiorSemisWinners[1])
 
         finalMatch = MatchSerializer(finalMatch, many=True)
 
@@ -687,9 +577,6 @@ class EndChampzView(APIView):
             file.write(strBuilder)
 
         file.close()
-
-        #for participant in participants:
-        #    participant.delete()
 
         return Response()
 

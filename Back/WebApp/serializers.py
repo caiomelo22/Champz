@@ -17,9 +17,14 @@ class LeagueSerializer(serializers.HyperlinkedModelSerializer):
 
 class ParticipantSerializer(serializers.HyperlinkedModelSerializer):
     team = serializers.PrimaryKeyRelatedField(queryset=models.Team.objects.all())
+    team_loading_att = serializers.SerializerMethodField('is_team_loading')
+
+    def is_team_loading(self):
+        return False
+        
     class Meta:
         model = models.Participant
-        fields = ['id', 'name', 'budget', 'team']
+        fields = ['id', 'name', 'budget', 'team', 'team_loading_att']
 
 
 class TeamSerializer(serializers.HyperlinkedModelSerializer):

@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from WebApp.models import Nation, League, Participant, Team, Position, Player, Group, Match
 from WebApp.serializers import NationSerializer, LeagueSerializer, ParticipantSerializer, TeamSerializer, \
     PositionSerializer, PlayerSerializer, GroupSerializer, MatchSerializer
-from WebApp.services import get_futbin_data, getPlayersByPositionString, writePlayersSheet, strip_player_positions_string
+from WebApp.services import get_futbin_data, getPlayersByPositionString, writePlayersSheet, strip_player_positions_string, getPlayersByPositionAlgorythm
 from django_filters.rest_framework import DjangoFilterBackend
 
 import openpyxl
@@ -138,6 +138,22 @@ class PlayerViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filter_fields = ['position', 'team_participant', 'team_origin']
 
+    def cut_player_quantity(self, position):
+        if position.name == 'Goalkeepers':
+            return getPlayersByPositionAlgorythm(position.id, 1.5)
+        elif position.name == 'Center Backs':
+            return getPlayersByPositionAlgorythm(position.id, 3)
+        elif position.name == 'Full Backs':
+            return getPlayersByPositionAlgorythm(position.id, 3)
+        elif position.name == 'Defensive Midfielders':
+            return getPlayersByPositionAlgorythm(position.id, 3)
+        elif position.name == 'Ofensive Midfielders':
+            return getPlayersByPositionAlgorythm(position.id, 1.5)
+        elif position.name == 'Wingers':
+            return getPlayersByPositionAlgorythm(position.id, 2.5)
+        elif position.name == 'Attackers':
+            return getPlayersByPositionAlgorythm(position.id, 2)
+
     def create(self, request, *args, **kwargs):
         data = dict(request.data)
         position = Position.objects.get(id=int(data['position']))
@@ -153,11 +169,12 @@ class PlayerViewSet(viewsets.ModelViewSet):
         if 'team_participant' in request._request.__dict__['environ']['QUERY_STRING']:
             team_participant = request._request.__dict__['environ']['QUERY_STRING'].split('=')[1]
             players = [player for player in players if str(player.team_participant_id)==team_participant]
+            players.sort(key=lambda item: (item.overall, item.pace), reverse=True)
         if 'position' in request._request.__dict__['environ']['QUERY_STRING']:
             position = request._request.__dict__['environ']['QUERY_STRING'].split('=')[1]
-            position_obj = Position.objects.filter(id=position)[0]
-            players = [player for player in players if player.specific_position in position_obj.specific_positions.split(';')]
-        players.sort(key=lambda item: (item.overall, item.pace), reverse=True)
+            position_obj = Position.objects.get(id=position)
+            players = self.cut_player_quantity(position_obj)
+        
         return Response(PlayerSerializer(players, many=True).data)
 
 

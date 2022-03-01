@@ -8,4 +8,5 @@
 /Back/ChampzWeb/wwwroot/Nations
 /Back/ChampzWeb/__pycache__
 /Back/WebApp/__pycache__
+/Back/ChampzWeb/config.py
 *.pyc

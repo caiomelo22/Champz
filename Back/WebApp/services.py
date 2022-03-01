@@ -32,15 +32,13 @@ def get_jogador_index(obj, position):
 def strip_player_positions_string():
     players = Player.objects.all()
     for player in players:
-        player.specific_position = player.specific_position.split('|')[
-            0].strip()
+        player.specific_position = player.specific_position.split('|')[0].strip()
         player.save()
 
 
 def get_futbin_data():
     positions = {'Goalkeepers': 'GK', 'Center Backs': 'CB', 'Full Backs': 'RB,LB', 'Defensive Midfielders': 'CDM,CM',
                  'Ofensive Midfielders': 'CAM', 'Wingers': 'LW,LF,LM,RF,RW,RM', 'Attackers': 'ST,CF'}
-    # positions = {'Goalkeepers': 'GK'}
 
     base_url = "https://www.fifacm.com/players?position="
 
@@ -54,15 +52,12 @@ def get_futbin_data():
     # driver.maximize_window()
     # print(playerRows)
 
-    # CRIANDO O LOOP PARA PASSAR POR TODAS AS POSICOES
     for name, positions in positions.items():
         query = Position.objects.filter(name=name)
         if len(query) == 0:
             position = Position.create(name)
         else:
             position = query[0]
-
-        # PEGANDO OS JOGADORES DO FUTBIN
 
         for pagina in range(1, 4):
             url = base_url + positions
@@ -82,7 +77,6 @@ def get_futbin_data():
             if positions == 'GK':
                 scrollStride = 210
 
-            # print(igs_btns)
             for btn in igs_btns:
                 btn.click()
                 driver.execute_script("window.scrollTo({}, {})".format(
@@ -189,17 +183,15 @@ def get_futbin_data():
                 player.save()
 
                 cont += 2
-                
+
     driver.quit()
 
 
 def getPlayersByPositionAlgorythm(position_id, n):
     n = int(n)
-    position_obj = Position.objects.filter(id=position_id)[0]
-    print(position_obj.specific_positions.split(';'))
+    position_obj = Position.objects.get(id=position_id)
     players = list(Player.objects.all().order_by('-overall'))
-    players = [
-        player for player in players if player.specific_position in position_obj.specific_positions.split(';')]
+    players = [player for player in players if player.specific_position in position_obj.specific_positions.split(';')]
     players.sort(key=lambda item: (item.overall, item.pace), reverse=True)
     players = players[:n]
     return players

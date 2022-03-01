@@ -317,7 +317,7 @@ class GenerateFirstKnockoutRoundView(APIView):
             old_stage = old_stage[0]
             old_stage.delete()
 
-        groups = list(Group.objects.all())
+        groups = list(Group.objects.filter(group='Group 1'))
 
         if len(groups) == 1:
             table = groups[0].getGroupTable()[:4]
@@ -346,7 +346,7 @@ class GenerateWildcardKnockoutRoundView(APIView):
             old_stage = old_stage[0]
             old_stage.delete()
 
-        groups = list(Group.objects.all())
+        groups = list(Group.objects.filter(group='Group 1'))
 
         if len(groups) == 1:
             tableWildcard = groups[0].getGroupTable()[2:6]
@@ -377,7 +377,7 @@ class GenerateSemiFinalsRoundView(APIView):
 
     def get_group_winners(self, group, teams, group_stage):
         qualified = []
-        group = Group.objects.filter(group=group)[0]
+        group = Group.objects.get(group=group)
         for team in teams:
             if team[1]['P'] == 3:
                 qualified.append(team[0])
@@ -401,10 +401,11 @@ class GenerateSemiFinalsRoundView(APIView):
             old_stage = old_stage[0]
             old_stage.delete()
 
-        groups = list(Group.objects.all())
-        table_group_stage = groups[0].getGroupTable()
+        group_stage = Group.objects.get(group='Group 1')
+        table_group_stage = group_stage.getGroupTable()
 
-        table_wildcard = groups[1].getGroupTable()
+        wildcard_stage = Group.objects.get(group='Wildcard')
+        table_wildcard = wildcard_stage.getGroupTable()
         semis = Group.create('Semis')
 
         wildcard_winners = self.get_group_winners('Wildcard', table_wildcard, table_group_stage)
@@ -449,7 +450,7 @@ class GenerateFinalView(APIView):
             old_stage = old_stage[0]
             old_stage.delete()
 
-        semis = list(Group.objects.filter(group='Semis'))[0]
+        semis = Group.objects.get(group='Semis')
 
         finalMatch = semis.generateFinalRound()
 

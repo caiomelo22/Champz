@@ -12,6 +12,7 @@ import io
 from django.conf import settings
 from PIL import Image
 import time
+import json
 
 
 def get_id_from_href(link):
@@ -32,15 +33,13 @@ def get_jogador_index(obj, position):
 def strip_player_positions_string():
     players = Player.objects.all()
     for player in players:
-        player.specific_position = player.specific_position.split('|')[
-            0].strip()
+        player.specific_position = player.specific_position.split('|')[0].strip()
         player.save()
 
 
-def get_futbin_data():
+def get_players_db():
     positions = {'Goalkeepers': 'GK', 'Center Backs': 'CB', 'Full Backs': 'RB,LB', 'Defensive Midfielders': 'CDM,CM',
                  'Ofensive Midfielders': 'CAM', 'Wingers': 'LW,LF,LM,RF,RW,RM', 'Attackers': 'ST,CF'}
-    # positions = {'Goalkeepers': 'GK'}
 
     base_url = "https://www.fifacm.com/players?position="
 
@@ -54,15 +53,12 @@ def get_futbin_data():
     # driver.maximize_window()
     # print(playerRows)
 
-    # CRIANDO O LOOP PARA PASSAR POR TODAS AS POSICOES
     for name, positions in positions.items():
         query = Position.objects.filter(name=name)
         if len(query) == 0:
-            position = Position.create(name)
+            position = Position.create(name, positions)
         else:
             position = query[0]
-
-        # PEGANDO OS JOGADORES DO FUTBIN
 
         for pagina in range(1, 4):
             url = base_url + positions
@@ -82,7 +78,6 @@ def get_futbin_data():
             if positions == 'GK':
                 scrollStride = 210
 
-            # print(igs_btns)
             for btn in igs_btns:
                 btn.click()
                 driver.execute_script("window.scrollTo({}, {})".format(
@@ -125,12 +120,12 @@ def get_futbin_data():
                     if('notfound' not in team_img):
                         image_content = requests.get(team_img).content
                         image_file = io.BytesIO(image_content)
-                        file_path = settings.BASE_DIR + \
+                        file_path = settings.MEDIA_ROOT + \
                             "/Teams/{}.jpg".format(team.replace(' ', ''))
                         open(file_path, "wb").write(image_file.getbuffer())
 
                         team_img = file_path
-                    team = Team.objects.create(name=team, image_link=team_img)
+                    team = Team.objects.create(name=team, image_path=team_img)
                 else:
                     team = query[0]
                 player.team_origin = team
@@ -140,7 +135,7 @@ def get_futbin_data():
                     if('notfound' not in nation_img):
                         image_content = requests.get(nation_img).content
                         image_file = io.BytesIO(image_content)
-                        file_path = settings.BASE_DIR + \
+                        file_path = settings.MEDIA_ROOT + \
                             "/Nations/{}.jpg".format(nation.replace(' ', ''))
                         open(file_path, "wb").write(image_file.getbuffer())
 
@@ -162,12 +157,12 @@ def get_futbin_data():
                 if('notfound_player' not in player_img_url):
                     image_content = requests.get(player_img_url).content
                     image_file = io.BytesIO(image_content)
-                    file_path = settings.BASE_DIR + \
+                    file_path = settings.MEDIA_ROOT + \
                         "/Players/{}_{}.jpg".format(
                             player.name.replace(' ', ''), player.id)
                     open(file_path, "wb").write(image_file.getbuffer())
 
-                    player.image_link = file_path
+                    player.image_path = file_path
                 else:
                     cont += 2
                     continue
@@ -190,129 +185,32 @@ def get_futbin_data():
 
                 cont += 2
 
-            # PEGANDO DADOS DOS JOGADORES
-
-            # cont = 0
-            # lista = 1
-            #
-            # while cont < len(players_1):
-            #     if lista == 1:
-            #         if cont > len(players_1)-1:
-            #             break
-            #         jogador = players_1[cont]
-            #     else:
-            #         if cont > len(players_2)-1:
-            #             break
-            #         jogador = players_2[cont]
-            #
-            #     tds = jogador.findAll('td')
-            #
-            #     data = tds[0].findAll('a')
-            #
-            #     player = Player(position=position)
-            #
-            #     player_img = tds[0].find("div", {"class": "d-inline"})
-            #     player_img = player_img.find('img')['data-original']
-            #     player.image_link = player_img
-            #
-            #     player.name = ''.join(data[0].findAll(text=True))
-            #
-            #     player.id = get_id_from_href(data[0]['href'])
-            #
-            #     league = data[3]['data-original-title']
-            #
-            #     allowedLeagues = ['LaLiga Santander', 'Premier League', 'Bundesliga', 'Serie A TIM', 'Ligue 1 Conforama']
-            #
-            #     if league not in allowedLeagues:
-            #         if lista == 1:
-            #             lista = 2
-            #         else:
-            #             lista = 1
-            #             cont += 1
-            #         continue
-            #
-            #     query = League.objects.filter(name=league)
-            #     if len(query) == 0:
-            #         league = League.create(league)
-            #     else:
-            #         league = query[0]
-            #     player.league = league
-            #
-            #     team = data[1]['data-original-title']
-            #     team_img = data[1].find('img')['src']
-            #     query = Team.objects.filter(name=team)
-            #     if len(query) == 0:
-            #         team = Team.create(team, league, team_img)
-            #     else:
-            #         team = query[0]
-            #     player.team_origin = team
-            #
-            #     nation = data[2]['data-original-title']
-            #     nation_img = data[2].find('img')['src']
-            #     query = Nation.objects.filter(name=nation)
-            #     if len(query) == 0:
-            #         nation = Nation.create(nation, nation_img)
-            #     else:
-            #         nation = query[0]
-            #     player.nation = nation
-            #
-            #     player.overall = ''.join(tds[1].findAll(text=True))
-            #
-            #     player.specific_position = ''.join(tds[2].findAll(text=True))
-            #     # print(player.specific_position)
-            #
-            #     # dados['posicao'] = ''.join(tds[2].findAll(text=True))
-            #     # dados['preco'] = ''.join(tds[4].findAll(text=True))
-            #
-            #     # rates = tds[7].findAll('span')
-            #     # dados['attack_rate'] = ''.join(rates[0].findAll(text=True))
-            #     # dados['defense_rate'] = ''.join(rates[1].findAll(text=True))
-            #
-            #     # dados['stats'] = dict()
-            #     player.pace = ''.join(tds[8].findAll(text=True))
-            #     player.shooting = ''.join(tds[9].findAll(text=True))
-            #     player.passing = ''.join(tds[10].findAll(text=True))
-            #     player.dribbling = ''.join(tds[11].findAll(text=True))
-            #     player.defending = ''.join(tds[12].findAll(text=True))
-            #     player.physical = ''.join(tds[13].findAll(text=True))
-            #     player.likes = ''.join(tds[15].findAll(text=True))
-            #
-            #     # dados['altura'] = ''.join(tds[14].div.findAll(text=True))
-            #
-            #     index = get_jogador_index(player, position)
-            #
-            #     if index >= 0:
-            #         other_player = Player.objects.get(id=index)
-            #         if int(player.id) > other_player.id:
-            #             other_player.delete()
-            #             player.save()
-            #         else:
-            #             other_player.team_participant = None
-            #             other_player.value = None
-            #
-            #             if int(player.likes) > other_player.likes:
-            #                 other_player.likes = int(player.likes)
-            #
-            #             other_player.save()
-            #     else:
-            #         player.save()
-            #
-            #     if lista == 1:
-            #         lista = 2
-            #     else:
-            #         lista = 1
-            #         cont += 1
-
     driver.quit()
 
+    update_teams_leagues()
+
+def update_teams_leagues():
+    f = open('leagues.json', encoding="utf-8")
+    leagues = json.load(f)
+    for league, teams in leagues.items():
+        league_obj = League.objects.filter(name=league)
+        if len(league_obj) > 0:
+            league_obj = league_obj[0]
+        else:
+            league_obj = League.create(name=league)
+        for team in teams:
+            try:
+                team_obj = Team.objects.get(name=team)
+                team_obj.league = league_obj
+                team_obj.save()
+            except:
+                continue
 
 def getPlayersByPositionAlgorythm(position_id, n):
     n = int(n)
-    position_obj = Position.objects.filter(id=position_id)[0]
-    print(position_obj.specific_positions.split(';'))
+    position_obj = Position.objects.get(id=position_id)
     players = list(Player.objects.all().order_by('-overall'))
-    players = [
-        player for player in players if player.specific_position in position_obj.specific_positions.split(';')]
+    players = [player for player in players if player.specific_position in position_obj.specific_positions.split(';')]
     players.sort(key=lambda item: (item.overall, item.pace), reverse=True)
     players = players[:n]
     return players

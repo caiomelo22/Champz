@@ -8,4 +8,10 @@
 /Back/ChampzWeb/wwwroot/Nations
 /Back/ChampzWeb/__pycache__
 /Back/WebApp/__pycache__
+/Back/config.py
+/Back/champz.txt
+/Back/matches.txt
+/Back/transfers.txt
+/Back/teams.xlsx
+/Back/players.xlsx
 *.pyc

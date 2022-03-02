@@ -4,7 +4,7 @@ from WebApp import views as WebAppViews
 from WebApp.views import BuyPlayerView, AddTeamGroupView, CreateMatchesView, GetGroupTableView, RegisterScoreView, \
     GenerateFirstKnockoutRoundView, GenerateFinalView, TransfersView, ChampzPlayersView, StartChampzView, EndChampzView, \
     ParticipantsTeamsView, GenerateWildcardKnockoutRoundView, GenerateSemiFinalsRoundView, UpdatePlayerDatabaseView, \
-    StripPlayerPositionView, GetGroupsTableView, RedoGroupsMatchesView
+    UpdateTeamsLeaguesDatabaseView
 
 router = routers.DefaultRouter()
 router.register(r'nation', WebAppViews.NationViewSet)
@@ -19,21 +19,19 @@ router.register(r'match', WebAppViews.MatchViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('buy/<int:id>', BuyPlayerView.as_view(), name='post'),
-    path('add_team_group/<int:id>', AddTeamGroupView.as_view(), name='post'),
-    path('create_matches/<int:id>', CreateMatchesView.as_view(), name='post'),
+    path('add-team-group/<int:id>', AddTeamGroupView.as_view(), name='post'),
+    path('create-matches/<int:id>', CreateMatchesView.as_view(), name='post'),
     path('table/<int:id>', GetGroupTableView.as_view(), name='get'),
-    path('tables/', GetGroupsTableView.as_view(), name='get'),
-    path('register_score/<int:id>', RegisterScoreView.as_view(), name='post'),
-    path('generate_1st_knockout/', GenerateFirstKnockoutRoundView.as_view(), name='post'),
-    path('generate_wildcards/', GenerateWildcardKnockoutRoundView.as_view(), name='post'),
-    path('generate_semis/', GenerateSemiFinalsRoundView.as_view(), name='post'),
-    path('generate_final', GenerateFinalView.as_view(), name='post'),
+    path('register-score/<int:id>', RegisterScoreView.as_view(), name='post'),
+    path('generate-1st-knockout/', GenerateFirstKnockoutRoundView.as_view(), name='post'),
+    path('generate-wildcards/', GenerateWildcardKnockoutRoundView.as_view(), name='post'),
+    path('generate-semis/', GenerateSemiFinalsRoundView.as_view(), name='post'),
+    path('generate-final', GenerateFinalView.as_view(), name='post'),
     path('transfers/', TransfersView.as_view(), name='get'),
-    path('champz_players/', ChampzPlayersView.as_view(), name='get'),
-    path('participants_teams/', ParticipantsTeamsView.as_view(), name='get'),
-    path('start-champz/<int:groupsQuantity>', StartChampzView.as_view(), name='post'),
-    path('redo-group-matches/', RedoGroupsMatchesView.as_view(), name='post'),
-    path('end_champz/', EndChampzView.as_view(), name='post'),
-    path('update-players/', UpdatePlayerDatabaseView.as_view(), name='get'),
-    path('strip-players-position/', StripPlayerPositionView.as_view(), name='get'),
+    path('champz-players/', ChampzPlayersView.as_view(), name='get'),
+    path('participants-teams/', ParticipantsTeamsView.as_view(), name='get'),
+    path('start-group/', StartChampzView.as_view(), name='post'),
+    path('end-champz/', EndChampzView.as_view(), name='post'),
+    path('update-players/', UpdatePlayerDatabaseView.as_view(), name='post'),
+    path('update-teams-leagues/', UpdateTeamsLeaguesDatabaseView.as_view(), name='post'),
 ]

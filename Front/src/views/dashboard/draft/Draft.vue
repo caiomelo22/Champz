@@ -51,14 +51,9 @@
                   <td class="champzFont">
                     <img
                       style="width: 30px"
-                      :src="
-                        gs.getTeamImageLink(
-                          getPlayerTeam(getParticipantTeam(participant.id).id)
-                            .image_link
-                        )
-                      "
+                      :src="gs.getTeamImageLink(participant.team.image_path)"
                     />
-                    {{ getParticipantTeam(participant.id).name }}
+                    {{ participant.team.name }}
                   </td>
                   <td>
                     <v-btn
@@ -86,10 +81,7 @@
                       :loading="participant.teamLoading"
                       @click="
                         currentParticipant = participant;
-                        getPlayersByTeam(
-                          participant.id,
-                          getParticipantTeam(participant.id).id
-                        );
+                        getPlayersByTeam(participant.id, participant.team.id);
                         showParticipantTeamModal = true;
                       "
                     >
@@ -122,7 +114,7 @@
           <v-row justify="center" v-if="playersLoading" class="my-6">
             <v-progress-circular indeterminate size="15"></v-progress-circular>
           </v-row>
-          <v-simple-table class="mt-4" v-else>
+          <v-simple-table class="mt-4" v-else-if="tab != -1">
             <template v-slot:default>
               <thead>
                 <tr>
@@ -152,24 +144,16 @@
                   <td class="champzFont">{{ player.id }}</td>
                   <td class="champzFont">
                     <img
-                      :src="gs.getPlayerImageLink(player.image_link)"
+                      :src="gs.getPlayerImageLink(player.image_path)"
                       style="max-height: 80px"
                     />
                     <img
                       style="width: 30px"
-                      :src="
-                        gs.getNationImageLink(
-                          getPlayerNation(player.nation).image_link
-                        )
-                      "
+                      :src="gs.getNationImageLink(player.nation.image_path)"
                     />
                     <img
                       style="width: 30px"
-                      :src="
-                        gs.getTeamImageLink(
-                          getPlayerTeam(player.team_origin).image_link
-                        )
-                      "
+                      :src="gs.getTeamImageLink(player.team_origin.image_path)"
                     />
                   </td>
                   <td class="champzFont">
@@ -178,12 +162,7 @@
                   <td class="champzFont">{{ player.overall }}</td>
                   <td class="champzFont">{{ player.specific_position }}</td>
                   <td class="champzFont">
-                    <!-- <img
-                      v-show="player.team_participant!=null"
-                      style="width:30px;"
-                      :src="getPlayerTeam(player.team_participant).image_link"
-                    />-->
-                    {{ getPlayerOwner(player.team_participant) }}
+                    {{ player.team_participant }}
                   </td>
                   <td class="champzFont">${{ player.value }}</td>
                   <td>
@@ -265,91 +244,93 @@
           <h5>BUY PLAYER</h5>
         </v-card-title>
         <v-card-text>
-          <div class="text-center" style="display: flex; justify-content: center; position: relative">
+          <div
+            class="text-center"
+            style="display: flex; justify-content: center; position: relative"
+          >
             <div class="card-info">
-            <div class="card-left-info">
-              <span
-                style="margin-bottom: 10px; font-size: 40px; font-weight: bold; z-index: 2;"
-                >{{ currentPlayer.overall }}</span
-              >
-              <span style="font-size: 25px; z-index: 2;">{{
-                currentPlayer.specific_position
-              }}</span>
+              <div class="card-left-info">
+                <span
+                  style="
+                    margin-bottom: 10px;
+                    font-size: 40px;
+                    font-weight: bold;
+                    z-index: 2;
+                  "
+                  >{{ currentPlayer.overall }}</span
+                >
+                <span style="font-size: 25px; z-index: 2">{{
+                  currentPlayer.specific_position
+                }}</span>
+                <img
+                  style="width: 60px; z-index: 2; margin: auto"
+                  :src="gs.getNationImageLink(currentPlayer.nation.image_path)"
+                />
+                <img
+                  style="width: 60px; z-index: 2; margin: auto"
+                  :src="
+                    gs.getTeamImageLink(currentPlayer.team_origin.image_path)
+                  "
+                />
+              </div>
               <img
-                style="width: 60px; z-index: 2; margin: auto;"
-                :src="
-                  gs.getNationImageLink(
-                    getPlayerNation(currentPlayer.nation).image_link
-                  )
+                :src="gs.getPlayerImageLink(currentPlayer.image_path)"
+                style="
+                  max-height: 160px;
+                  z-index: 2;
+                  position: absolute;
+                  top: 100px;
+                  left: -28px;
                 "
               />
-              <img
-                style="width: 60px; z-index: 2; margin: auto"
-                :src="
-                  gs.getTeamImageLink(
-                    getPlayerTeam(currentPlayer.team_origin).image_link
-                  )
-                "
-              />
-            </div>
-            <img
-              :src="gs.getPlayerImageLink(currentPlayer.image_link)"
-              style="
-                    max-height: 160px;
-    z-index: 2;
-    position: absolute;
-    top: 100px;
-    left: -28px;
-              "
-            />
-            <div class="card-name">
-              <span style="font-weight: 700; font-size: 17px">{{
-                currentPlayer.name
-              }}</span>
-            </div>
-            <div class="card-stats">
-              <div class="vertical-divisor"></div>
-              <div class="card-stats-left">
-                <v-row no-gutters>
-                  <span class="mr-1 card-stat-value">{{
-                    currentPlayer.pace
-                  }}</span
-                  ><span class="mr-1 card-stat-name">PAC</span>
-                </v-row>
-                <v-row no-gutters>
-                  <span class="mr-1 card-stat-value">{{
-                    currentPlayer.shooting
-                  }}</span
-                  ><span class="mr-1 card-stat-name">SHO</span>
-                </v-row>
-                <v-row no-gutters>
-                  <span class="mr-1 card-stat-value">{{
-                    currentPlayer.passing
-                  }}</span
-                  ><span class="mr-1 card-stat-name">PAS</span>
-                </v-row>
+              <div class="card-name">
+                <span style="font-weight: 700; font-size: 17px">{{
+                  currentPlayer.name
+                }}</span>
               </div>
-              <div class="card-stats-right text-end">
-                <v-row no-gutters>
-                  <span class="mr-1 card-stat-value">{{
-                    currentPlayer.dribbling
-                  }}</span
-                  ><span class="mr-1 card-stat-name">DRI</span>
-                </v-row>
-                <v-row no-gutters>
-                  <span class="mr-1 card-stat-value">{{
-                    currentPlayer.defending
-                  }}</span
-                  ><span class="mr-1 card-stat-name">DEF</span>
-                </v-row>
-                <v-row no-gutters>
-                  <span class="mr-1 card-stat-value">{{
-                    currentPlayer.physical
-                  }}</span
-                  ><span class="mr-1 card-stat-name">PHY</span>
-                </v-row>
+              <div class="card-stats">
+                <div class="vertical-divisor"></div>
+                <div class="card-stats-left">
+                  <v-row no-gutters>
+                    <span class="mr-1 card-stat-value">{{
+                      currentPlayer.pace
+                    }}</span
+                    ><span class="mr-1 card-stat-name">PAC</span>
+                  </v-row>
+                  <v-row no-gutters>
+                    <span class="mr-1 card-stat-value">{{
+                      currentPlayer.shooting
+                    }}</span
+                    ><span class="mr-1 card-stat-name">SHO</span>
+                  </v-row>
+                  <v-row no-gutters>
+                    <span class="mr-1 card-stat-value">{{
+                      currentPlayer.passing
+                    }}</span
+                    ><span class="mr-1 card-stat-name">PAS</span>
+                  </v-row>
+                </div>
+                <div class="card-stats-right text-end">
+                  <v-row no-gutters>
+                    <span class="mr-1 card-stat-value">{{
+                      currentPlayer.dribbling
+                    }}</span
+                    ><span class="mr-1 card-stat-name">DRI</span>
+                  </v-row>
+                  <v-row no-gutters>
+                    <span class="mr-1 card-stat-value">{{
+                      currentPlayer.defending
+                    }}</span
+                    ><span class="mr-1 card-stat-name">DEF</span>
+                  </v-row>
+                  <v-row no-gutters>
+                    <span class="mr-1 card-stat-value">{{
+                      currentPlayer.physical
+                    }}</span
+                    ><span class="mr-1 card-stat-name">PHY</span>
+                  </v-row>
+                </div>
               </div>
-            </div>
             </div>
             <img
               src="../../../assets/gold.png"
@@ -371,8 +352,7 @@
               outlined
               dense
             ></v-combobox>
-            <v-card-actions style="display: flex;
-    justify-content: flex-end;">
+            <v-card-actions style="display: flex; justify-content: flex-end">
               <v-btn color="red" @click="buyPlayerModal = false">Cancel</v-btn>
               <v-btn type="submit" color="green">Save changes</v-btn>
             </v-card-actions>
@@ -410,7 +390,7 @@
                       removeBuy(player.id);
                       getPlayersByTeam(
                         currentParticipant.id,
-                        getParticipantTeam(currentParticipant.id).id
+                        currentParticipant.team.id
                       );
                     "
                   >
@@ -484,11 +464,11 @@
   height: 102px;
   width: 273px;
 }
-.card-left-info {    
+.card-left-info {
   z-index: 2;
-    display: grid;
-    margin-left: -120px;
-    margin-top: 63px;
+  display: grid;
+  margin-left: -120px;
+  margin-top: 63px;
 }
 .champzFont {
   font-size: 18px;
@@ -512,20 +492,12 @@ export default {
     showParticipantTeamModal: false,
     participants: [],
     genericBudget: 250,
-    teams: [],
     edit: false,
     nations: [],
     positions: [],
     leagues: [],
     selectedPosition: [],
     selectedTeam: [],
-    keepers: [],
-    fullBacks: [],
-    centerBacks: [],
-    defensiveMids: [],
-    attackingMids: [],
-    wingers: [],
-    attackers: [],
     plTeams: [],
     loading: false,
     currentPlayer: {},
@@ -535,190 +507,57 @@ export default {
   }),
   watch: {
     tab() {
-      if (this.tab == 0) {
-        this.selectedPosition = this.keepers;
-      } else if (this.tab == 1) {
-        this.selectedPosition = this.centerBacks;
-      } else if (this.tab == 2) {
-        this.selectedPosition = this.fullBacks;
-      } else if (this.tab == 3) {
-        this.selectedPosition = this.defensiveMids;
-      } else if (this.tab == 4) {
-        this.selectedPosition = this.attackingMids;
-      } else if (this.tab == 5) {
-        this.selectedPosition = this.wingers;
-      } else if (this.tab == 6) {
-        this.selectedPosition = this.attackers;
-      }
+      this.getPlayersByPosition(this.positions[this.tab].id);
     },
   },
-  mounted: function () {
-    this.getParticipants();
-    this.getLeagues();
-    this.getTeams();
-    this.getNations();
-    this.getPositions();
+  mounted: async function () {
+    await this.getParticipants();
+    await this.getLeagues();
+    await this.getPLTeams();
+    await this.getPositions();
   },
   methods: {
-    select_cbx_item: function (id, array) {
-      var i;
-      for (i = 0; i < array.length; i++) {
-        if (array[i].id == id) {
-          return array[i];
-        }
-      }
-    },
     open_participant_dialog: function (participant) {
       if (participant == null) {
         this.edit = false;
         this.newParticipant = { name: null, budget: null, team: null };
         this.addParticipantModal = true;
       } else {
-        this.newParticipant = participant;
+        this.newParticipant = JSON.parse(JSON.stringify(participant));
         this.edit = true;
-        this.newParticipant.team = this.getParticipantTeam(participant.id);
         this.addParticipantModal = true;
       }
     },
-    getParticipants: function () {
+    getParticipants: async function () {
       this.loading = true;
-      this.service
+      await this.service
         .getRequest("/api/participant/")
         .then((response) => {
-          response = response.map((x) => {
-            x.teamLoading = false;
-            return x;
-          });
           this.participants = response;
-          this.loading = false;
         })
-        .catch((err) => {
-          this.loading = false;
-          console.log("erro", err);
-        });
+        .catch((err) => {});
+      this.loading = false;
     },
-    getTeams: function () {
-      this.loading = true;
-      this.service
-        .getRequest("/api/team/")
-        .then((response) => {
-          this.teams = response;
-          this.loading = false;
-        })
-        .catch((err) => {
-          this.loading = false;
-          console.log(err);
-        });
-    },
-    getNations: function () {
-      this.loading = true;
-      this.service
-        .getRequest("/api/nation/")
-        .then((response) => {
-          this.nations = response;
-          this.loading = false;
-        })
-        .catch((err) => {
-          this.loading = false;
-          console.log(err);
-        });
-    },
-    getPositions: function () {
+    getPositions: async function () {
       this.loading = true;
       this.service
         .getRequest("/api/position/")
         .then((response) => {
           this.positions = response;
-          this.getPlayersByPosition(response[6].id);
-          this.getPlayersByPosition(response[5].id);
-          this.getPlayersByPosition(response[4].id);
-          this.getPlayersByPosition(response[3].id);
-          this.getPlayersByPosition(response[2].id);
-          this.getPlayersByPosition(response[1].id);
           this.getPlayersByPosition(response[0].id);
-          this.loading = false;
         })
-        .catch((err) => {
-          this.loading = false;
-          console.log(err);
-        });
+        .catch((err) => {});
+      this.loading = false;
     },
-    compare: function (a, b) {
-      if (a.overall - b.overall == 0) {
-        return a.pace - b.pace;
-      } else {
-        return a.overall - b.overall;
-      }
-    },
-    selectPlayers: function (a, b) {
-      if (a.overall > b.overall) {
-        return 1;
-      } else if (a.overall < b.overall) {
-        return -1;
-      }
-
-      // Else go to the 2nd item
-      if (a.pace < b.pace) {
-        return -1;
-      } else if (a.pace > b.pace) {
-        return 1;
-      } else {
-        // nothing to split them
-        return 0;
-      }
-      // return (
-      //   (a.overall * 100 + a.likes) / 101 - (b.overall * 100 + b.likes) / 101
-      // );
-    },
-    filterPlayers: function (array, n) {
-      console.log(array);
-      array.sort(this.selectPlayers);
-      array.reverse();
-      array = array.slice(0, Math.round(n * this.participants.length));
-      array.sort(this.compare);
-      array.reverse();
-      return array;
-    },
-    getPlayersByPosition: function (id_position) {
+    getPlayersByPosition: async function (id_position) {
       this.loading = true;
-      this.service
+      await this.service
         .getRequest("/api/player?position=" + id_position)
         .then((response) => {
-          if (id_position === this.positions[0].id) {
-            this.keepers = response;
-            this.keepers = this.filterPlayers(this.keepers, 1.5);
-            this.selectedPosition = this.keepers;
-          } else if (id_position === this.positions[1].id) {
-            this.centerBacks = response;
-            this.centerBacks = this.filterPlayers(this.centerBacks, 3);
-            this.selectedPosition = this.centerBacks;
-          } else if (id_position === this.positions[2].id) {
-            this.fullBacks = response;
-            this.fullBacks = this.filterPlayers(this.fullBacks, 3);
-            this.selectedPosition = this.fullBacks;
-          } else if (id_position === this.positions[3].id) {
-            this.defensiveMids = response;
-            this.defensiveMids = this.filterPlayers(this.defensiveMids, 3);
-            this.selectedPosition = this.defensiveMids;
-          } else if (id_position === this.positions[4].id) {
-            this.attackingMids = response;
-            this.attackingMids = this.filterPlayers(this.attackingMids, 1.5);
-            this.selectedPosition = this.attackingMids;
-          } else if (id_position === this.positions[5].id) {
-            this.wingers = response;
-            this.wingers = this.filterPlayers(this.wingers, 2.5);
-            this.selectedPosition = this.wingers;
-          } else if (id_position === this.positions[6].id) {
-            this.attackers = response;
-            this.attackers = this.filterPlayers(this.attackers, 2);
-            this.selectedPosition = this.attackers;
-          }
-          this.loading = false;
+          this.selectedPosition = response;
         })
-        .catch((err) => {
-          this.loading = false;
-          console.log(err);
-        });
+        .catch((err) => {});
+      this.loading = false;
     },
     getPlayersByTeam: function (participant_id, id_team) {
       var index = this.participants.map((x) => x.id).indexOf(participant_id);
@@ -735,183 +574,95 @@ export default {
           console.log(err);
         });
     },
-    getPLTeams: function () {
+    getPLTeams: async function () {
       this.loading = true;
-      this.service
-        .getRequest("/api/team?league=" + this.leagues[1].id)
+      var pl = this.leagues.filter((x) => x.name.includes("ENG 1"))[0];
+      await this.service
+        .getRequest("/api/team?league=" + pl.id)
         .then((response) => {
           this.plTeams = response;
-          this.loading = false;
         })
-        .catch((err) => {
-          this.loading = false;
-          console.log(err);
-        });
+        .catch((err) => {});
+      this.loading = false;
     },
-    getLeagues: function () {
+    getLeagues: async function () {
       this.loading = true;
-      this.service
+      await this.service
         .getRequest("/api/league/")
         .then((response) => {
           this.leagues = response;
-          this.getPLTeams();
-          this.loading = false;
         })
-        .catch((err) => {
-          this.loading = false;
-          console.log(err);
-        });
-    },
-    getPlayerTeam: function (id) {
-      var obj = {};
-      this.teams.forEach((element) => {
-        if (element.id === id) {
-          obj = element;
-          return obj;
-        }
-      });
-      return obj;
-    },
-    getPlayerNation: function (id) {
-      var obj = {};
-      this.nations.forEach((element) => {
-        if (element.id === id) {
-          obj = element;
-          return obj;
-        }
-      });
-      return obj;
+        .catch((err) => {});
+      this.loading = false;
     },
     getPlayer: function (player) {
-      // this.currentPlayer = player;
       this.currentPlayer = Object.assign({}, player);
-      if (this.currentPlayer.team_participant != null) {
-        this.currentPlayer.team_participant = this.getPlayerTeam(
-          this.currentPlayer.team_participant
-        );
-      }
       this.buyPlayerModal = true;
-
-      // var url = "/api/player/" + id + "/";
-      // this.service
-      //   .getRequest(url)
-      //   .then((response) => {
-      //     this.currentPlayer = response;
-      //     console.log(this.currentPlayer);
-      //     this.buyPlayerModal = true;
-      //     this.loading = false;
-      //   })
-      //   .catch((err) => {
-      //     this.loading = false;
-      //     console.log(err);
-      //   });
     },
-    getPlayerOwner: function (id) {
-      // console.log('were in boys');
-      var owner, team, name;
-      owner = "";
-      if (id != null) {
-        // console.log('hello again');
-        this.participants.forEach((element) => {
-          team = this.getParticipantTeam(element.id);
-          if (team.id === id) {
-            name = element.name;
-            owner = name;
-            return owner;
-          }
-        });
-      }
-      return owner;
-    },
-    getParticipantTeam: function (id) {
-      var team = {};
-      this.plTeams.forEach((element) => {
-        if (element.participant === id) {
-          team = element;
-          return team;
-        }
-      });
-      return team;
-    },
-    addParticipant: function () {
+    addParticipant: async function () {
       this.loading = true;
       if (!this.edit) {
         this.newParticipant.budget = this.genericBudget;
         this.newParticipant.team = this.newParticipant.team.id;
-        this.service
+        await this.service
           .postRequest("/api/participant/", this.newParticipant)
           .then((response) => {
-            this.getParticipants();
-            this.getPLTeams();
-            this.getPositions();
-            this.loading = false;
+            this.participants.push(response);
             this.newParticipant.name = null;
             this.newParticipant.budget = null;
             this.newParticipant.team = null;
-            this.selectedPosition = null;
+            this.tab = -1;
             this.addParticipantModal = false;
           })
-          .catch((err) => {
-            this.loading = false;
-            console.log(err);
-          });
+          .catch((err) => {});
+        this.loading = false;
       } else {
         this.updateParticipant();
       }
     },
-    updateParticipant: function () {
+    updateParticipant: async function () {
       this.loading = true;
       var url = "/api/participant/" + this.newParticipant.id + "/";
       this.newParticipant.team = this.newParticipant.team.id;
-      this.service
+      await this.service
         .patchRequest(url, this.newParticipant)
         .then((response) => {
-          this.getParticipants();
-          this.getPLTeams();
-          this.getPositions();
-          this.selectedPosition = null;
+          var index = this.participants
+            .map((x) => x.id)
+            .indexOf(this.newParticipant.id);
+          this.participants[index] = response;
+          this.tab = -1;
           this.addParticipantModal = false;
-          this.loading = false;
         })
-        .catch((err) => {
-          this.loading = false;
-          console.log(err.body);
-        });
+        .catch((err) => {});
+      this.loading = false;
     },
-    deleteParticipant: function (id) {
-      console.log(id);
+    deleteParticipant: async function (id) {
       this.loading = true;
       var url = "/api/participant/" + id + "/";
-      console.log(url);
-      this.service
+      await this.service
         .deleteRequest(url)
         .then((response) => {
-          this.loading = false;
-          this.getParticipants();
-          this.getPLTeams();
-          this.getPositions();
-          this.selectedPosition = [];
+          var index = this.participants.map((x) => x.id).indexOf(id);
+          this.participants.splice(index, 1);
         })
-        .catch((err) => {
-          this.loading = false;
-          console.log(err);
-        });
+        .catch((err) => {});
+      this.loading = false;
     },
-    removeBuy: function (id) {
+    removeBuy: async function (id) {
       this.loading = true;
       var url = "/api/buy/" + id;
-      this.service
+      await this.service
         .postRequest(url, { team_participant: null })
         .then((response) => {
-          this.loading = false;
           this.currentPlayer = response;
-          this.getPlayersByPosition(this.currentPlayer.position);
-          this.getParticipants();
+          var index = this.selectedPosition.map((x) => x.id).indexOf(id);
+          if (index != -1) {
+            this.selectedPosition[index] = response;
+          }
         })
-        .catch((err) => {
-          this.loading = false;
-          console.log(err);
-        });
+        .catch((err) => {});
+      this.loading = false;
     },
     updateParticipantBudget() {
       var index = this.participants
@@ -926,7 +677,6 @@ export default {
       this.selectedPosition[index] = this.currentPlayer;
     },
     async buyPlayer() {
-      this.buyPlayerModal = false;
       this.playersLoading = true;
       this.currentPlayer.team_participant =
         this.currentPlayer.team_participant.team;
@@ -937,50 +687,37 @@ export default {
           this.currentPlayer = response;
           this.updatePlayer();
           this.updateParticipantBudget();
+          this.buyPlayerModal = false;
         })
-        .catch((err) => {
-          console.log(err);
-        });
+        .catch((err) => {});
       this.playersLoading = false;
     },
-    generateTransfersFile: function () {
+    generateTransfersFile: async function () {
       this.loading = true;
       var url = "/api/transfers/";
-      this.service
+      await this.service
         .postRequest(url)
-        .then((response) => {
-          this.loading = false;
-        })
-        .catch((err) => {
-          this.loading = false;
-          console.log(err);
-        });
+        .then((response) => {})
+        .catch((err) => {});
+      this.loading = false;
     },
-    generateTeamsFile: function () {
+    generateTeamsFile: async function () {
       this.loading = true;
       var url = "/api/participants_teams/";
-      this.service
+      await this.service
         .postRequest(url)
-        .then((response) => {
-          this.loading = false;
-        })
-        .catch((err) => {
-          this.loading = false;
-          console.log(err);
-        });
+        .then((response) => {})
+        .catch((err) => {});
+      this.loading = false;
     },
-    generatePlayersFile: function () {
+    generatePlayersFile: async function () {
       this.loading = true;
       var url = "/api/champz_players/";
-      this.service
+      await this.service
         .postRequest(url)
-        .then((response) => {
-          this.loading = false;
-        })
-        .catch((err) => {
-          this.loading = false;
-          console.log(err);
-        });
+        .then((response) => {})
+        .catch((err) => {});
+      this.loading = false;
     },
   },
   computed: {},

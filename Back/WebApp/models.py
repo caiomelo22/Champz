@@ -1,3 +1,4 @@
+import math
 from random import shuffle
 
 from django.db import models
@@ -6,11 +7,11 @@ from django.db import models
 class Nation(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
-    image_link = models.CharField(max_length=250, null=True)
+    image_path = models.CharField(max_length=250, null=True)
 
     @classmethod
     def create(cls, name, image):
-        nation = Nation.objects.create(name=name, image_link=image)
+        nation = Nation.objects.create(name=name, image_path=image)
         return nation
 
     def __str__(self):
@@ -51,11 +52,11 @@ class Team(models.Model):
     name = models.CharField(max_length=100)
     league = models.ForeignKey(League, null=True, blank=True, on_delete=models.CASCADE)
     participant = models.OneToOneField(Participant, null=True, blank=True, on_delete=models.SET_NULL)
-    image_link = models.CharField(max_length=250, null=True)
+    image_path = models.CharField(max_length=250, null=True)
 
     @classmethod
     def create(cls, name, league, image):
-        team = Team.objects.create(name=name, league=league, image_link=image)
+        team = Team.objects.create(name=name, league=league, image_path=image)
         return team
 
     def __str__(self):
@@ -68,8 +69,8 @@ class Position(models.Model):
     specific_positions = models.CharField(max_length=100, null=True)
 
     @classmethod
-    def create(cls, name):
-        position = Position.objects.create(name=name)
+    def create(cls, name, specific_positions):
+        position = Position.objects.create(name=name, specific_positions=specific_positions)
         return position
 
     def __str__(self):
@@ -88,7 +89,7 @@ class Player(models.Model):
     physical = models.IntegerField(null=True)
     likes = models.IntegerField(null=True)
     value = models.IntegerField(null=True, blank=True)
-    image_link = models.CharField(max_length=250, null=True)
+    image_path = models.CharField(max_length=250, null=True)
     position = models.ForeignKey(Position, null=True, blank=True, on_delete=models.SET_NULL)
     specific_position = models.CharField(max_length=5, null=True)
     team_origin = models.ForeignKey(Team, null=True, blank=True, on_delete=models.SET_NULL,
@@ -100,31 +101,24 @@ class Player(models.Model):
     @classmethod
     def create(cls, name, overall, position, team_origin, nation, image, spec_pos, likes):
         player = Player.objects.create(name=name, overall=overall, position=position, team_origin=team_origin, 
-        nation=nation, image_link=image, specific_position=spec_pos, likes=likes)
+        nation=nation, image_path=image, specific_position=spec_pos, likes=likes)
         return player
 
     def buyPlayer(self, team, price):
-        if not team:
-            if self.team_participant:
-                self.team_participant.participant.budget += self.value
-                self.team_participant.participant.save()
-                self.team_participant = None
-                self.value = None
-                self.save()
-            return True
-
-        participant = team.participant
-
-        if participant.budget - price < 0:
-            return False
-
         if self.team_participant:
             self.team_participant.participant.budget += self.value
             self.team_participant.participant.save()
             self.team_participant = None
             self.value = None
+            self.save()
 
-        participant = Participant.objects.get(id=participant.id)
+        if not team:
+            return True
+
+        participant = Participant.objects.get(id=team.participant.id)
+
+        if participant.budget - price < 0:
+            return False
 
         participant.budget -= price
         participant.save()
@@ -170,25 +164,19 @@ class Group(models.Model):
 
     def createMatches(self):
         teams_list = list(self.teams.all())
-        total_matches = (len(teams_list) * (len(teams_list) - 1)) / 2
         shuffle(teams_list)
 
         matches = []
 
-        count_group_matches = 0
+        half = math.floor(len(teams_list)/2)
+        first_half = teams_list[:half]
+        second_half = teams_list[half:]
 
-        while count_group_matches < total_matches:
-            if self.match_exists(teams_list[0], teams_list[1]):
-                teams_list.append(teams_list.pop(1))
-                if teams_list[1] == aux:
-                    teams_list.append(teams_list.pop(0))
-                    aux = teams_list[1]
-            else:
-                matches.append(Match.create(self, teams_list[0], teams_list[1]))
-                teams_list.append(teams_list.pop(0))
-                teams_list.append(teams_list.pop(0))
-                aux = teams_list[1]
-                count_group_matches += 1
+        for i in range(len(teams_list)):
+            for j in range(len(first_half)):
+                matches.append(Match.create(self, first_half[j], list(reversed(second_half))[j]))
+            first_half.append(second_half.pop(0))
+            second_half.append(first_half.pop(0))
 
         return matches
 
@@ -258,15 +246,33 @@ class Group(models.Model):
         for team in qualified:
             final.addTeam(team)
 
-        # for i in range(0,len(qualified),2):
-        #     matches.append(Match.create(final,qualified[i],qualified[i+1]))
-        print('qualified', qualified)
-        print('teams', teams)
         matches.append(Match.create(final, qualified[0], qualified[1]))
 
         final.save()
 
         return matches
+
+    def export_matches(self):
+        file = open("matches.txt", "w")
+
+        file.write('MATCHES: \n\n')
+
+        strBuilder = ""
+        strBuilder += '{}\n'.format(self.group.upper())
+        for match in self.matches:
+            team_1 = match.team_1.participant.name
+            team_2 = match.team_2.participant.name
+            goals_1 = match.goals_team_1
+            if goals_1 is None:
+                goals_1 = ''
+            goals_2 = match.goals_team_2
+            if goals_2 is None:
+                goals_2 = ''
+            strBuilder += '\t{} {} x {} {}\n'.format(team_1, goals_1, goals_2, team_2)
+        strBuilder += '\n'
+        file.write(strBuilder)
+
+        file.close()
 
     def __str__(self):
         return self.group

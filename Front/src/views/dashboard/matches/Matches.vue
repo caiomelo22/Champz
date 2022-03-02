@@ -133,7 +133,7 @@
                           "
                         />
                         X
-                        <!-- <img style="width:30px;" :src="getTeamById(match.team_2).image_link" /> -->
+                        <!-- <img style="width:30px;" :src="getTeamById(match.team_2).image_path" /> -->
                         <img
                           style="width: 30px"
                           :src="
@@ -164,13 +164,13 @@
                         />
                         <!-- <img
                 style="width:30px;"
-                :src="getTeamById(match.team_1).image_link"
+                :src="getTeamById(match.team_1).image_path"
                       />-->
                         {{ match.goals_team_1 }} X
                         {{ match.goals_team_2 }}
                         <!-- <img
                 style="width:30px;"
-                :src="getTeamById(match.team_2).image_link"
+                :src="getTeamById(match.team_2).image_path"
                       />-->
                         <img
                           style="width: 30px"

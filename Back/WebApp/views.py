@@ -45,7 +45,10 @@ class ParticipantViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = dict(request.data)
-        team = Team.objects.get(id=int(data['team']))
+        try:
+            team = Team.objects.get(id=int(data['team']))
+        except:
+            return HttpResponseNotFound("Selected team not found")
         if team.participant != None:
             return HttpResponseBadRequest("The chosen team has already been assigned to another participant.")
         participant = Participant.create(
@@ -55,7 +58,10 @@ class ParticipantViewSet(viewsets.ModelViewSet):
         return Response(participant.data)
 
     def partial_update(self, request, *args, **kwargs):
-        instance = Participant.objects.get(id=kwargs.get('pk'))
+        try:
+            instance = Participant.objects.get(id=kwargs.get('pk'))
+        except:
+            return HttpResponseNotFound("Participant not found")
         data = dict(request.data)
         team = data.get('team')
         if team != None:
@@ -91,7 +97,10 @@ class ParticipantViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
-        instance = Participant.objects.get(id=kwargs.get('pk'))
+        try:
+            instance = Participant.objects.get(id=kwargs.get('pk'))
+        except:
+            return HttpResponseNotFound("Participant not found")
         team = Team.objects.get(participant=instance.id)
         players = Player.objects.filter(team_participant=team.id)
         for player in players:
@@ -110,7 +119,10 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = dict(request.data)
-        league = League.objects.get(id=int(data['league']))
+        try:
+            league = League.objects.get(id=int(data['league']))
+        except:
+            return HttpResponseNotFound("League not found")
         team = Team.create(data['name'], league, data['image_path'])
         team = TeamSerializer(team, context={'request': request})
         return Response(team.data)
@@ -151,9 +163,18 @@ class PlayerViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = dict(request.data)
-        position = Position.objects.get(id=int(data['position']))
-        team_origin = Team.objects.get(id=int(data['team_origin']))
-        nation = Nation.objects.get(id=int(data['nation']))
+        try:
+            position = Position.objects.get(id=int(data['position']))
+        except:
+            return HttpResponseNotFound("Position not found")
+        try:
+            team_origin = Team.objects.get(id=int(data['team_origin']))
+        except:
+            return HttpResponseNotFound("Team not found")
+        try:
+            nation = Nation.objects.get(id=int(data['nation']))
+        except:
+            return HttpResponseNotFound("Nation not found")
         player = Player.create(data['name'], int(
             data['overall']), position, team_origin, nation, data['image_path'], data['specific_position'])
         player = PlayerSerializer(player, context={'request': request})
@@ -167,7 +188,10 @@ class PlayerViewSet(viewsets.ModelViewSet):
             players.sort(key=lambda item: (item.overall, item.pace), reverse=True)
         if 'position' in request._request.__dict__['environ']['QUERY_STRING']:
             position = request._request.__dict__['environ']['QUERY_STRING'].split('=')[1]
-            position_obj = Position.objects.get(id=position)
+            try:
+                position_obj = Position.objects.get(id=position)
+            except:
+                return HttpResponseNotFound("Position not found")
             players = self.cut_player_quantity(position_obj)
         
         return Response(PlayerSerializer(players, many=True).data)
@@ -190,9 +214,18 @@ class MatchViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = dict(request.data)
-        group = Group.objects.get(id=int(data['group']))
-        team_1 = Team.objects.get(id=int(data['team_1']))
-        team_2 = Team.objects.get(id=int(data['team_2']))
+        try:
+            group = Group.objects.get(id=int(data['group']))
+        except:
+            return HttpResponseNotFound("Group not found")
+        try:
+            team_1 = Team.objects.get(id=int(data['team_1']))
+        except:
+            return HttpResponseNotFound("Selected team 1 not found")
+        try:
+            team_2 = Team.objects.get(id=int(data['team_2']))
+        except:
+            return HttpResponseNotFound("Selected team 2 not found")
         match = Match.create(group, team_1, team_2)
         match = MatchSerializer(match, context={'request': request})
         return Response(match.data)
@@ -235,7 +268,10 @@ class AddTeamGroupView(APIView):
             group = group[0]
 
         data = dict(request.data)
-        team = Team.objects.get(id=int(data['id']))
+        try:
+            team = Team.objects.get(id=int(data['id']))
+        except:
+            return HttpResponseNotFound("Team not found")
         group.addTeam(team)
 
         return Response(TeamSerializer(group.teams, many=True).data)
@@ -258,73 +294,20 @@ class CreateMatchesView(APIView):
         return Response(matches)
 
 class StartChampzView(APIView):
-    def chunks(self, lst, n):
-        """Yield successive n-sized chunks from lst."""
-        for i in range(0, len(lst), n):
-            yield lst[i:i + n]
     def post(self, request, groupsQuantity):
         groups = Group.objects.all()
         for group in groups:
             group.delete()
-
-        matches = []
-
-        participants = list(Participant.objects.all())
-
-        participant_groups = self.chunks(participants, int(len(participants)/groupsQuantity))
-
-        for i, group_participants in enumerate(participant_groups):
-            group = Group.create('Group {}'.format(i+1))
-            for participant in group_participants:
-                team = Team.objects.get(participant=participant)
-                group.addTeam(team)
-            
-            matches.extend(group.createMatches())
+        
+        participants = Participant.objects.all()
+        group = Group.create('Group 1')
+        for participant in participants:
+            team = Team.objects.get(participant=participant)
+            group.addTeam(team)
+        
+        matches = group.createMatches()
 
         group.export_matches()
-
-        matches = MatchSerializer(matches, many=True).data
-
-        return Response(matches)
-
-class RedoGroupsMatchesView(APIView):
-    def post(self, request):
-        groups = list(Group.objects.all())
-        matches = Match.objects.all()
-        for match in matches:
-            match.delete()
-
-        matches = []
-
-        group1 = list(groups[0].teams.all())
-        group2 = list(groups[1].teams.all())
-        for i in range(len(group1)):
-            for j in range(len(group2)):
-                team_1 = Team.objects.filter(id=group1[i].id)[0]
-                team_2 = Team.objects.filter(id=group2[j].id)[0]
-                matches.append(Match.create(groups[0], team_1, team_2))
-
-        file = open("matches.txt", "w")
-
-        file.write('MATCHES: \n\n')
-
-        strBuilder = ""
-        # strBuilder += '{}\n'.format(group.group.upper())
-        for match in matches:
-            team_1 = match.team_1.participant.name
-            team_2 = match.team_2.participant.name
-            goals_1 = match.goals_team_1
-            print(goals_1, type(goals_1))
-            if goals_1 is None:
-                goals_1 = ''
-            goals_2 = match.goals_team_2
-            if goals_2 is None:
-                goals_2 = ''
-            strBuilder += '\t{} {} x {} {}\n'.format(team_1, goals_1, goals_2, team_2)
-        strBuilder += '\n'
-        file.write(strBuilder)
-
-        file.close()
 
         matches = MatchSerializer(matches, many=True).data
 
@@ -348,27 +331,6 @@ class GetGroupTableView(APIView):
             new_table.append(
                 (TeamSerializer(participant[0]).data, participant[1]))
         return JsonResponse(new_table, safe=False)
-
-class GetGroupsTableView(APIView):
-    def get(self, request):
-        groups = list(Group.objects.all())
-        groups = [g for g in groups if 'Group' in g.group]
-        if len(groups) == 0:
-            return HttpResponseNotFound("No groups found.")
-        
-        tables = []
-
-        for group in groups:
-            table = group.getGroupTable()
-            tables.append([])
-
-            dic = dict()
-
-            for participant in table:
-                dic[participant[0].id] = participant[1]
-                tables[-1].append(
-                    (TeamSerializer(participant[0]).data, participant[1]))
-        return JsonResponse(tables, safe=False)
 
 
 class RegisterScoreView(APIView):
@@ -445,20 +407,6 @@ class GenerateWildcardKnockoutRoundView(APIView):
             matchesWildcard.append(Match.create(wildcard, tableWildcard[1][0], tableWildcard[2][0]))
             
             wildcard.save()
-
-        elif len(groups) == 2:
-            print(groups)
-            for i in range(2):
-                tableWildcard = groups[i].getGroupTable()[1:3]
-                wildcard = Group.create('Wildcard {}'.format(i+1))
-
-                for team in tableWildcard:
-                    wildcard.addTeam(team[0])
-
-                matchesWildcard.append(Match.create(wildcard, tableWildcard[0][0], tableWildcard[1][0]))
-                
-                wildcard.save()
-
         else:
             return HttpResponseBadRequest("Number of groups does not allow the generation of a knockout round.")
 
@@ -477,7 +425,10 @@ class GenerateSemiFinalsRoundView(APIView):
 
     def get_group_winners(self, group, teams, group_stage):
         qualified = []
-        group = Group.objects.get(group=group)
+        try:
+            group = Group.objects.get(group=group)
+        except:
+            return HttpResponseNotFound("Group not found")
         for team in teams:
             if team[1]['P'] == 3:
                 qualified.append(team[0])
@@ -494,7 +445,6 @@ class GenerateSemiFinalsRoundView(APIView):
         return qualified
 
     def post(self, request):
-        wildcard_stage = [g for g in groups if 'Wildcard' in g.group]
         matchesSemi = []
 
         old_stage = Group.objects.filter(group='Semis')
@@ -502,54 +452,39 @@ class GenerateSemiFinalsRoundView(APIView):
             old_stage = old_stage[0]
             old_stage.delete()
 
-        group_stage = Group.objects.get(group='Group 1')
+        try:
+            group_stage = Group.objects.get(group='Group 1')
+        except:
+            return HttpResponseNotFound("Group stage not found")
         table_group_stage = group_stage.getGroupTable()
  
-        wildcard_stage = Group.objects.get(group='Wildcard')
+        try:
+            wildcard_stage = Group.objects.get(group='Wildcard')
+        except:
+            return HttpResponseNotFound("Wildcard stage not found")
         table_wildcard = wildcard_stage.getGroupTable()
         semis = Group.create('Semis')
-        
-        if len(group_stage) == 1:
-            table_group_stage = group_stage[0].getGroupTable()
-            table_wildcard = wildcard_stage[0].getGroupTable()
 
-            wildcard_winners = self.get_group_winners('Wildcard', table_wildcard, table_group_stage)
+        wildcard_winners = self.get_group_winners('Wildcard', table_wildcard, table_group_stage)
 
-            semis.addTeam(table_group_stage[0][0])
-            semis.addTeam(table_group_stage[1][0])
-            semis.addTeam(wildcard_winners[0])
-            semis.addTeam(wildcard_winners[1])
+        semis.addTeam(table_group_stage[0][0])
+        semis.addTeam(table_group_stage[1][0])
+        semis.addTeam(wildcard_winners[0])
+        semis.addTeam(wildcard_winners[1])
 
-            wc1_position = self.checkPositionGroupStage(wildcard_winners[0], table_group_stage)
-            wc2_position = self.checkPositionGroupStage(wildcard_winners[1], table_group_stage)
+        wc1_position = self.checkPositionGroupStage(wildcard_winners[0], table_group_stage)
+        wc2_position = self.checkPositionGroupStage(wildcard_winners[1], table_group_stage)
 
-            if wc1_position < wc2_position:
-                matchesSemi.append(Match.create(semis, table_group_stage[0][0], wildcard_winners[1]))
-                matchesSemi.append(Match.create(semis,  wildcard_winners[1], table_group_stage[0][0]))
-                matchesSemi.append(Match.create(semis, table_group_stage[1][0], wildcard_winners[0]))
-                matchesSemi.append(Match.create(semis, wildcard_winners[0], table_group_stage[1][0]))
-            else:
-                matchesSemi.append(Match.create(semis, table_group_stage[0][0], wildcard_winners[0]))
-                matchesSemi.append(Match.create(semis, wildcard_winners[0], table_group_stage[0][0]))
-                matchesSemi.append(Match.create(semis, table_group_stage[1][0], wildcard_winners[1]))
-                matchesSemi.append(Match.create(semis, wildcard_winners[1], table_group_stage[1][0]))
-
-        if len(group_stage) == 2:
-            qualified = []
-            for i in range(2):
-                table_group_stage = group_stage[i].getGroupTable()
-                table_wildcard = wildcard_stage[i].getGroupTable()
-
-                wildcard_winners = self.get_group_winners('Wildcard {}'.format(i+1), table_wildcard, table_group_stage)
-                qualified.append(table_group_stage[0][0])
-                qualified.append(wildcard_winners[0])
-                semis.addTeam(table_group_stage[0][0])
-                semis.addTeam(wildcard_winners[0])
-                
-            matchesSemi.append(Match.create(semis, qualified[0], qualified[1]))
-            matchesSemi.append(Match.create(semis, qualified[1], qualified[0]))
-            matchesSemi.append(Match.create(semis, qualified[2], qualified[3]))
-            matchesSemi.append(Match.create(semis, qualified[3], qualified[2]))
+        if wc1_position < wc2_position:
+            matchesSemi.append(Match.create(semis, table_group_stage[0][0], wildcard_winners[1]))
+            matchesSemi.append(Match.create(semis,  wildcard_winners[1], table_group_stage[0][0]))
+            matchesSemi.append(Match.create(semis, table_group_stage[1][0], wildcard_winners[0]))
+            matchesSemi.append(Match.create(semis, wildcard_winners[0], table_group_stage[1][0]))
+        else:
+            matchesSemi.append(Match.create(semis, table_group_stage[0][0], wildcard_winners[0]))
+            matchesSemi.append(Match.create(semis, wildcard_winners[0], table_group_stage[0][0]))
+            matchesSemi.append(Match.create(semis, table_group_stage[1][0], wildcard_winners[1]))
+            matchesSemi.append(Match.create(semis, wildcard_winners[1], table_group_stage[1][0]))
 
         semis.save()
 

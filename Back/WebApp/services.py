@@ -12,6 +12,7 @@ import io
 from django.conf import settings
 from PIL import Image
 import time
+import json
 
 
 def get_id_from_href(link):
@@ -36,7 +37,7 @@ def strip_player_positions_string():
         player.save()
 
 
-def get_futbin_data():
+def get_players_db():
     positions = {'Goalkeepers': 'GK', 'Center Backs': 'CB', 'Full Backs': 'RB,LB', 'Defensive Midfielders': 'CDM,CM',
                  'Ofensive Midfielders': 'CAM', 'Wingers': 'LW,LF,LM,RF,RW,RM', 'Attackers': 'ST,CF'}
 
@@ -55,7 +56,7 @@ def get_futbin_data():
     for name, positions in positions.items():
         query = Position.objects.filter(name=name)
         if len(query) == 0:
-            position = Position.create(name)
+            position = Position.create(name, positions)
         else:
             position = query[0]
 
@@ -119,12 +120,12 @@ def get_futbin_data():
                     if('notfound' not in team_img):
                         image_content = requests.get(team_img).content
                         image_file = io.BytesIO(image_content)
-                        file_path = settings.BASE_DIR + \
+                        file_path = settings.MEDIA_ROOT + \
                             "/Teams/{}.jpg".format(team.replace(' ', ''))
                         open(file_path, "wb").write(image_file.getbuffer())
 
                         team_img = file_path
-                    team = Team.objects.create(name=team, image_link=team_img)
+                    team = Team.objects.create(name=team, image_path=team_img)
                 else:
                     team = query[0]
                 player.team_origin = team
@@ -134,7 +135,7 @@ def get_futbin_data():
                     if('notfound' not in nation_img):
                         image_content = requests.get(nation_img).content
                         image_file = io.BytesIO(image_content)
-                        file_path = settings.BASE_DIR + \
+                        file_path = settings.MEDIA_ROOT + \
                             "/Nations/{}.jpg".format(nation.replace(' ', ''))
                         open(file_path, "wb").write(image_file.getbuffer())
 
@@ -156,12 +157,12 @@ def get_futbin_data():
                 if('notfound_player' not in player_img_url):
                     image_content = requests.get(player_img_url).content
                     image_file = io.BytesIO(image_content)
-                    file_path = settings.BASE_DIR + \
+                    file_path = settings.MEDIA_ROOT + \
                         "/Players/{}_{}.jpg".format(
                             player.name.replace(' ', ''), player.id)
                     open(file_path, "wb").write(image_file.getbuffer())
 
-                    player.image_link = file_path
+                    player.image_path = file_path
                 else:
                     cont += 2
                     continue
@@ -186,6 +187,24 @@ def get_futbin_data():
 
     driver.quit()
 
+    update_teams_leagues()
+
+def update_teams_leagues():
+    f = open('leagues.json', encoding="utf-8")
+    leagues = json.load(f)
+    for league, teams in leagues.items():
+        league_obj = League.objects.filter(name=league)
+        if len(league_obj) > 0:
+            league_obj = league_obj[0]
+        else:
+            league_obj = League.create(name=league)
+        for team in teams:
+            try:
+                team_obj = Team.objects.get(name=team)
+                team_obj.league = league_obj
+                team_obj.save()
+            except:
+                continue
 
 def getPlayersByPositionAlgorythm(position_id, n):
     n = int(n)

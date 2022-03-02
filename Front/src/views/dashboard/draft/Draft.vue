@@ -51,7 +51,7 @@
                   <td class="champzFont">
                     <img
                       style="width: 30px"
-                      :src="gs.getTeamImageLink(participant.team.image_link)"
+                      :src="gs.getTeamImageLink(participant.team.image_path)"
                     />
                     {{ participant.team.name }}
                   </td>
@@ -144,16 +144,16 @@
                   <td class="champzFont">{{ player.id }}</td>
                   <td class="champzFont">
                     <img
-                      :src="gs.getPlayerImageLink(player.image_link)"
+                      :src="gs.getPlayerImageLink(player.image_path)"
                       style="max-height: 80px"
                     />
                     <img
                       style="width: 30px"
-                      :src="gs.getNationImageLink(player.nation.image_link)"
+                      :src="gs.getNationImageLink(player.nation.image_path)"
                     />
                     <img
                       style="width: 30px"
-                      :src="gs.getTeamImageLink(player.team_origin.image_link)"
+                      :src="gs.getTeamImageLink(player.team_origin.image_path)"
                     />
                   </td>
                   <td class="champzFont">
@@ -264,17 +264,17 @@
                 }}</span>
                 <img
                   style="width: 60px; z-index: 2; margin: auto"
-                  :src="gs.getNationImageLink(currentPlayer.nation.image_link)"
+                  :src="gs.getNationImageLink(currentPlayer.nation.image_path)"
                 />
                 <img
                   style="width: 60px; z-index: 2; margin: auto"
                   :src="
-                    gs.getTeamImageLink(currentPlayer.team_origin.image_link)
+                    gs.getTeamImageLink(currentPlayer.team_origin.image_path)
                   "
                 />
               </div>
               <img
-                :src="gs.getPlayerImageLink(currentPlayer.image_link)"
+                :src="gs.getPlayerImageLink(currentPlayer.image_path)"
                 style="
                   max-height: 160px;
                   z-index: 2;
@@ -576,7 +576,7 @@ export default {
     },
     getPLTeams: async function () {
       this.loading = true;
-      var pl = this.leagues.filter((x) => x.name.includes("Premier League"))[0];
+      var pl = this.leagues.filter((x) => x.name.includes("ENG 1"))[0];
       await this.service
         .getRequest("/api/team?league=" + pl.id)
         .then((response) => {

@@ -58,7 +58,7 @@
                   <tbody>
                     <tr v-for="(team, i) in table" :key="i">
                       <td class="champzFont">
-                        <!-- <img style="width:30px;" :src="team[0].image_link" /> -->
+                        <!-- <img style="width:30px;" :src="team[0].image_path" /> -->
                         {{
                           getTeamParticipant(
                             team[0].participant
@@ -115,10 +115,10 @@
                         }}
                         <!-- <img
                 style="width:30px;"
-                :src="getTeamById(match.team_1).image_link"
+                :src="getTeamById(match.team_1).image_path"
                       />-->
                         X
-                        <!-- <img style="width:30px;" :src="getTeamById(match.team_2).image_link" /> -->
+                        <!-- <img style="width:30px;" :src="getTeamById(match.team_2).image_path" /> -->
                         {{
                           getTeamParticipant(
                             getTeamById(match.team_2).participant
@@ -133,13 +133,13 @@
                         }}
                         <!-- <img
                 style="width:30px;"
-                :src="getTeamById(match.team_1).image_link"
+                :src="getTeamById(match.team_1).image_path"
                       />-->
                         {{ match.goals_team_1 }} X
                         {{ match.goals_team_2 }}
                         <!-- <img
                 style="width:30px;"
-                :src="getTeamById(match.team_2).image_link"
+                :src="getTeamById(match.team_2).image_path"
                       />-->
                         {{
                           getTeamParticipant(

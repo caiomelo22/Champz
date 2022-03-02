@@ -4,22 +4,17 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.utils import json
 from rest_framework.views import APIView
 
 from WebApp.models import Nation, League, Participant, Team, Position, Player, Group, Match
 from WebApp.serializers import NationSerializer, LeagueSerializer, ParticipantSerializer, TeamSerializer, \
     PositionSerializer, PlayerSerializer, GroupSerializer, MatchSerializer
-from WebApp.services import get_futbin_data, getPlayersByPositionString, writePlayersSheet, strip_player_positions_string, getPlayersByPositionAlgorythm
+from WebApp.services import get_players_db, getPlayersByPositionString, writePlayersSheet, strip_player_positions_string, getPlayersByPositionAlgorythm, update_teams_leagues
 from django_filters.rest_framework import DjangoFilterBackend
 
 import openpyxl
 
 import operator
-
-
-# class InitializeDB:
-#     get_futbin_data()
 
 
 class NationViewSet(viewsets.ModelViewSet):
@@ -599,11 +594,11 @@ class EndChampzView(APIView):
         return Response()
 
 class UpdatePlayerDatabaseView(APIView):
-    def get(self, request):
-        get_futbin_data()
+    def post(self, request):
+        get_players_db()
         return Response()
 
-class StripPlayerPositionView(APIView):
-    def get(self, request):
-        strip_player_positions_string()
+class UpdateTeamsLeaguesDatabaseView(APIView):
+    def post(self, request):
+        update_teams_leagues()
         return Response()

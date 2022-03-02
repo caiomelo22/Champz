@@ -4,7 +4,7 @@ from WebApp import views as WebAppViews
 from WebApp.views import BuyPlayerView, AddTeamGroupView, CreateMatchesView, GetGroupTableView, RegisterScoreView, \
     GenerateFirstKnockoutRoundView, GenerateFinalView, TransfersView, ChampzPlayersView, StartGroupView, EndChampzView, \
     ParticipantsTeamsView, GenerateWildcardKnockoutRoundView, GenerateSemiFinalsRoundView, UpdatePlayerDatabaseView, \
-    StripPlayerPositionView
+    UpdateTeamsLeaguesDatabaseView
 
 router = routers.DefaultRouter()
 router.register(r'nation', WebAppViews.NationViewSet)
@@ -32,6 +32,6 @@ urlpatterns = [
     path('participants-teams/', ParticipantsTeamsView.as_view(), name='get'),
     path('start-group/', StartGroupView.as_view(), name='post'),
     path('end-champz/', EndChampzView.as_view(), name='post'),
-    path('update-players/', UpdatePlayerDatabaseView.as_view(), name='get'),
-    path('strip-players-position/', StripPlayerPositionView.as_view(), name='get'),
+    path('update-players/', UpdatePlayerDatabaseView.as_view(), name='post'),
+    path('update-teams-leagues/', UpdateTeamsLeaguesDatabaseView.as_view(), name='post'),
 ]

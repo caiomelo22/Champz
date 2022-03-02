@@ -69,8 +69,8 @@ class Position(models.Model):
     specific_positions = models.CharField(max_length=100, null=True)
 
     @classmethod
-    def create(cls, name):
-        position = Position.objects.create(name=name)
+    def create(cls, name, specific_positions):
+        position = Position.objects.create(name=name, specific_positions=specific_positions)
         return position
 
     def __str__(self):

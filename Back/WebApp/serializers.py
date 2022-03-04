@@ -14,25 +14,26 @@ class LeagueSerializer(serializers.HyperlinkedModelSerializer):
         model = models.League
         fields = ['id', 'name']
 
+class TeamSerializer(serializers.HyperlinkedModelSerializer):
+    # league = serializers.PrimaryKeyRelatedField(queryset=models.League.objects.all())
+    # participant = serializers.PrimaryKeyRelatedField(queryset=models.Participant.objects.all(), required=False)
+    league = LeagueSerializer()
+    # participant = ParticipantSerializer()
+    class Meta:
+        model = models.Team
+        fields = ['id', 'name', 'league', 'image_path']
+
+
 class ParticipantSerializer(serializers.HyperlinkedModelSerializer):
-    # team = serializers.PrimaryKeyRelatedField(queryset=models.Team.objects.all())
+    team = TeamSerializer(read_only = True)
     team_loading_att = serializers.SerializerMethodField('is_team_loading')
 
-    def is_team_loading(self):
+    def is_team_loading(self, obj):
         return False
         
     class Meta:
         model = models.Participant
         fields = ['id', 'name', 'budget', 'team', 'team_loading_att']
-
-class TeamSerializer(serializers.HyperlinkedModelSerializer):
-    # league = serializers.PrimaryKeyRelatedField(queryset=models.League.objects.all())
-    # participant = serializers.PrimaryKeyRelatedField(queryset=models.Participant.objects.all(), required=False)
-    league = LeagueSerializer()
-    participant = ParticipantSerializer()
-    class Meta:
-        model = models.Team
-        fields = ['id', 'name', 'league', 'participant', 'image_path']
 
 
 class PositionSerializer(serializers.HyperlinkedModelSerializer):

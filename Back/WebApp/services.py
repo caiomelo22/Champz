@@ -210,7 +210,7 @@ def getPlayersByPositionAlgorythm(position_id, n):
     n = int(n)
     position_obj = Position.objects.get(id=position_id)
     players = list(Player.objects.all().order_by('-overall'))
-    players = [player for player in players if player.specific_position in position_obj.specific_positions.split(';')]
+    players = [player for player in players if player.specific_position in position_obj.specific_positions.split(',')]
     players.sort(key=lambda item: (item.overall, item.pace), reverse=True)
     players = players[:n]
     return players

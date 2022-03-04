@@ -18,10 +18,10 @@ class TeamSerializer(serializers.HyperlinkedModelSerializer):
     # league = serializers.PrimaryKeyRelatedField(queryset=models.League.objects.all())
     # participant = serializers.PrimaryKeyRelatedField(queryset=models.Participant.objects.all(), required=False)
     league = LeagueSerializer()
-    # participant = ParticipantSerializer()
+    participant = serializers.PrimaryKeyRelatedField(queryset=models.Participant.objects.all())
     class Meta:
         model = models.Team
-        fields = ['id', 'name', 'league', 'image_path']
+        fields = ['id', 'name', 'league', 'image_path', 'participant']
 
 
 class ParticipantSerializer(serializers.HyperlinkedModelSerializer):

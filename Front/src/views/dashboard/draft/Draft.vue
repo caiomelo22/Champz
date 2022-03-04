@@ -122,6 +122,7 @@
                   <th scope="col">
                     <b>Player</b>
                   </th>
+                  <th></th>
                   <th scope="col">
                     <b>Overall</b>
                   </th>
@@ -162,7 +163,13 @@
                   <td class="champzFont">{{ player.overall }}</td>
                   <td class="champzFont">{{ player.specific_position }}</td>
                   <td class="champzFont">
-                    {{ player.team_participant }}
+                    {{
+                      player.team_participant
+                        ? get_participant_name(
+                            player.team_participant.participant
+                          )
+                        : "-"
+                    }}
                   </td>
                   <td class="champzFont">${{ player.value }}</td>
                   <td>
@@ -173,7 +180,7 @@
                       color="red"
                       fab
                       class="ml-2"
-                      @click="removeBuy(player.id)"
+                      @click="removeBuy(player)"
                     >
                       <v-icon large>mdi-cash-minus</v-icon>
                     </v-btn>
@@ -345,9 +352,12 @@
               prefix="$"
             ></v-text-field>
             <v-combobox
-              v-model="currentPlayer.team_participant"
+              v-model="participant_selected"
               :items="participants"
               item-text="name"
+              @change="
+                currentPlayer.team_participant = participant_selected.team
+              "
               label="Participant"
               outlined
               dense
@@ -387,7 +397,7 @@
                   <v-btn
                     color="red"
                     @click="
-                      removeBuy(player.id);
+                      removeBuy(player);
                       getPlayersByTeam(
                         currentParticipant.id,
                         currentParticipant.team.id
@@ -503,6 +513,7 @@ export default {
     currentPlayer: {},
     currentParticipant: {},
     selectedTeam: null,
+    participant_selected: null,
     newParticipant: { name: null, budget: null, team: null },
   }),
   watch: {
@@ -517,6 +528,12 @@ export default {
     await this.getPositions();
   },
   methods: {
+    get_participant_name(id) {
+      if (!id) {
+        return null;
+      }
+      return this.participants.filter((x) => x.id == id)[0].name;
+    },
     open_participant_dialog: function (participant) {
       if (participant == null) {
         this.edit = false;
@@ -649,14 +666,16 @@ export default {
         .catch((err) => {});
       this.loading = false;
     },
-    removeBuy: async function (id) {
+    removeBuy: async function (player) {
       this.loading = true;
-      var url = "/api/buy/" + id;
+      this.currentPlayer = player;
+      this.updateParticipantBudget(true);
+      var url = "/api/buy/" + player.id;
       await this.service
         .postRequest(url, { team_participant: null })
         .then((response) => {
           this.currentPlayer = response;
-          var index = this.selectedPosition.map((x) => x.id).indexOf(id);
+          var index = this.selectedPosition.indexOf(player);
           if (index != -1) {
             this.selectedPosition[index] = response;
           }
@@ -664,11 +683,17 @@ export default {
         .catch((err) => {});
       this.loading = false;
     },
-    updateParticipantBudget() {
+    updateParticipantBudget(add) {
       var index = this.participants
-        .map((x) => x.team)
-        .indexOf(this.currentPlayer.team_participant);
-      this.participants[index].budget -= this.currentPlayer.value;
+        .map((x) => x.team.id)
+        .indexOf(this.currentPlayer.team_participant.id);
+      if (index != -1) {
+        if (add) {
+          this.participants[index].budget += this.currentPlayer.value;
+        } else {
+          this.participants[index].budget -= this.currentPlayer.value;
+        }
+      }
     },
     updatePlayer() {
       var index = this.selectedPosition
@@ -678,15 +703,15 @@ export default {
     },
     async buyPlayer() {
       this.playersLoading = true;
-      this.currentPlayer.team_participant =
-        this.currentPlayer.team_participant.team;
+      var obj = JSON.parse(JSON.stringify(this.currentPlayer));
+      obj.team_participant = this.currentPlayer.team_participant.id;
       var url = "/api/buy/" + this.currentPlayer.id;
       await this.service
-        .postRequest(url, this.currentPlayer)
+        .postRequest(url, obj)
         .then((response) => {
           this.currentPlayer = response;
           this.updatePlayer();
-          this.updateParticipantBudget();
+          this.updateParticipantBudget(false);
           this.buyPlayerModal = false;
         })
         .catch((err) => {});

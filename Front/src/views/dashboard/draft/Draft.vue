@@ -613,7 +613,7 @@ export default {
       this.loading = false;
     },
     getPlayer: function (player) {
-      this.currentPlayer = Object.assign({}, player);
+      this.currentPlayer = JSON.parse(JSON.stringify(player))
       this.buyPlayerModal = true;
     },
     addParticipant: async function () {
@@ -668,13 +668,11 @@ export default {
     },
     removeBuy: async function (player) {
       this.loading = true;
-      this.currentPlayer = player;
-      this.updateParticipantBudget(true);
+      this.updateParticipantBudget(player, true);
       var url = "/api/buy/" + player.id;
       await this.service
         .postRequest(url, { team_participant: null })
         .then((response) => {
-          this.currentPlayer = response;
           var index = this.selectedPosition.indexOf(player);
           if (index != -1) {
             this.selectedPosition[index] = response;
@@ -683,35 +681,35 @@ export default {
         .catch((err) => {});
       this.loading = false;
     },
-    updateParticipantBudget(add) {
+    updateParticipantBudget(player, add) {
       var index = this.participants
         .map((x) => x.team.id)
-        .indexOf(this.currentPlayer.team_participant.id);
+        .indexOf(player.team_participant.id);
       if (index != -1) {
         if (add) {
-          this.participants[index].budget += this.currentPlayer.value;
+          this.participants[index].budget += player.value;
         } else {
-          this.participants[index].budget -= this.currentPlayer.value;
+          this.participants[index].budget -= player.value;
         }
       }
     },
-    updatePlayer() {
+    updatePlayer(player) {
       var index = this.selectedPosition
         .map((x) => x.id)
-        .indexOf(this.currentPlayer.id);
-      this.selectedPosition[index] = this.currentPlayer;
+        .indexOf(player.id);
+      this.selectedPosition[index] = player;
     },
     async buyPlayer() {
       this.playersLoading = true;
-      var obj = JSON.parse(JSON.stringify(this.currentPlayer));
-      obj.team_participant = this.currentPlayer.team_participant.id;
+      var player = JSON.parse(JSON.stringify(this.currentPlayer));
+      player.team_participant = this.currentPlayer.team_participant.id;
       var url = "/api/buy/" + this.currentPlayer.id;
       await this.service
-        .postRequest(url, obj)
+        .postRequest(url, player)
         .then((response) => {
-          this.currentPlayer = response;
-          this.updatePlayer();
-          this.updateParticipantBudget(false);
+          var player = response;
+          this.updatePlayer(player);
+          this.updateParticipantBudget(player);
           this.buyPlayerModal = false;
         })
         .catch((err) => {});

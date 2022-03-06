@@ -588,7 +588,6 @@ export default {
         })
         .catch((err) => {
           this.participants[index].teamLoading = false;
-          console.log(err);
         });
     },
     getPLTeams: async function () {

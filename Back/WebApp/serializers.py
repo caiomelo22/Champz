@@ -15,8 +15,6 @@ class LeagueSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'name']
 
 class TeamSerializer(serializers.HyperlinkedModelSerializer):
-    # league = serializers.PrimaryKeyRelatedField(queryset=models.League.objects.all())
-    # participant = serializers.PrimaryKeyRelatedField(queryset=models.Participant.objects.all(), required=False)
     league = LeagueSerializer()
     participant = serializers.PrimaryKeyRelatedField(queryset=models.Participant.objects.all())
     class Meta:
@@ -43,10 +41,6 @@ class PositionSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class PlayerSerializer(serializers.HyperlinkedModelSerializer):
-    # team_participant = serializers.PrimaryKeyRelatedField(queryset=models.Team.objects.all())
-    # position = serializers.PrimaryKeyRelatedField(queryset=models.Position.objects.all())
-    # nation = serializers.PrimaryKeyRelatedField(queryset=models.Nation.objects.all())
-    # team_origin = serializers.PrimaryKeyRelatedField(queryset=models.Team.objects.all())
     team_participant = TeamSerializer()
     position = PositionSerializer()
     nation = NationSerializer()
@@ -66,8 +60,6 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
 class MatchSerializer(serializers.HyperlinkedModelSerializer):
     group = serializers.PrimaryKeyRelatedField(queryset=models.Group.objects.all())
-    # team_1 = serializers.PrimaryKeyRelatedField(queryset=models.Team.objects.all())
-    # team_2 = serializers.PrimaryKeyRelatedField(queryset=models.Team.objects.all())
     team_1 = TeamSerializer()
     team_2 = TeamSerializer()
     class Meta:

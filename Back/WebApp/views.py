@@ -146,20 +146,21 @@ class PlayerViewSet(viewsets.ModelViewSet):
     filter_fields = ['position', 'team_participant', 'team_origin']
 
     def cut_player_quantity(self, position):
+        n_participants = len(Participant.objects.all())
         if position.name == 'Goalkeepers':
-            return getPlayersByPositionAlgorythm(position.id, 1.5)
+            return getPlayersByPositionAlgorythm(position.id, 1.5*n_participants)
         elif position.name == 'Center Backs':
-            return getPlayersByPositionAlgorythm(position.id, 3)
+            return getPlayersByPositionAlgorythm(position.id, 3*n_participants)
         elif position.name == 'Full Backs':
-            return getPlayersByPositionAlgorythm(position.id, 3)
+            return getPlayersByPositionAlgorythm(position.id, 3*n_participants)
         elif position.name == 'Defensive Midfielders':
-            return getPlayersByPositionAlgorythm(position.id, 3)
+            return getPlayersByPositionAlgorythm(position.id, 3*n_participants)
         elif position.name == 'Ofensive Midfielders':
-            return getPlayersByPositionAlgorythm(position.id, 1.5)
+            return getPlayersByPositionAlgorythm(position.id, 1.5*n_participants)
         elif position.name == 'Wingers':
-            return getPlayersByPositionAlgorythm(position.id, 2.5)
+            return getPlayersByPositionAlgorythm(position.id, 2.5*n_participants)
         elif position.name == 'Attackers':
-            return getPlayersByPositionAlgorythm(position.id, 2)
+            return getPlayersByPositionAlgorythm(position.id, 2*n_participants)
 
     def create(self, request, *args, **kwargs):
         data = dict(request.data)
@@ -496,7 +497,6 @@ class GenerateSemiFinalsRoundView(APIView):
 class GenerateFinalView(APIView):
     def checkPositionGroupStage(self, team, group_stage):
         for i, position in enumerate(group_stage):
-            print(position, i)
             if position[0] == team:
                 return i
         return -1
@@ -598,7 +598,6 @@ class EndChampzView(APIView):
             for player in players_participant:
                 strBuilder += '\t{} - {} - ${}\n'.format(player.name, player.overall, player.value)
             strBuilder += '\n'
-            print(strBuilder)
             file.write(strBuilder)
 
         groups = list(Group.objects.all())
@@ -628,7 +627,6 @@ class EndChampzView(APIView):
                 team_1 = match.team_1.participant.name
                 team_2 = match.team_2.participant.name
                 goals_1 = match.goals_team_1
-                print(goals_1, type(goals_1))
                 if goals_1 is None:
                     goals_1 = ''
                 goals_2 = match.goals_team_2

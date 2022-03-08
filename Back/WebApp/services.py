@@ -51,7 +51,6 @@ def get_players_db():
     options.add_argument("--disable-blink-features=AutomationControlled")
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     # driver.maximize_window()
-    # print(playerRows)
 
     for name, positions in positions.items():
         query = Position.objects.filter(name=name)

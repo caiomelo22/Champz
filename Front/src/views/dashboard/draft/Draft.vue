@@ -1,9 +1,9 @@
 <template>
   <v-container>
     <v-row>
-      <v-card class="mx-4" style="width: 100%">
+      <v-card class="mx-4 pa-3" style="width: 100%">
         <v-card-title>
-          <h3>Set budget</h3>
+          <h3 style="font-weight: bold !important">Set budget</h3>
         </v-card-title>
         <v-card-text>
           <v-text-field
@@ -15,9 +15,9 @@
       </v-card>
     </v-row>
     <v-row>
-      <v-card class="mx-4" style="width: 100%">
+      <v-card class="mx-4 pa-3" style="width: 100%">
         <v-card-title>
-          <h3>List of participants</h3>
+          <h3 style="font-weight: bold !important">List of participants</h3>
           <v-spacer></v-spacer>
           <v-btn color="green" fab @click="open_participant_dialog(null)">
             <v-icon large>mdi-plus</v-icon>
@@ -107,9 +107,9 @@
     </v-row>
 
     <v-row>
-      <v-card class="mx-4" style="width: 100%">
+      <v-card class="mx-4 pa-3" style="width: 100%">
         <v-card-title>
-          <h3>List of Players</h3>
+          <h3 style="font-weight: bold !important">List of Players</h3>
         </v-card-title>
         <v-card-text>
           <v-tabs v-model="tab">

@@ -533,7 +533,7 @@ export default {
       }
     },
     tab() {
-      this.get_players_by_position(this.positions[this.tab].id);
+      this.get_players_by_position_algorithm(this.positions[this.tab].id);
     },
   },
   mounted: async function () {
@@ -577,12 +577,12 @@ export default {
         .getRequest("/api/position/")
         .then((response) => {
           this.positions = response;
-          this.get_players_by_position(response[0].id);
+          this.get_players_by_position_algorithm(response[0].id);
         })
         .catch((err) => {});
       this.players_loading = false;
     },
-    get_players_by_position: async function (id_position) {
+    get_players_by_position_algorithm: async function (id_position) {
       this.players_loading = true;
       await this.service
         .getRequest("/api/player?position=" + id_position)
@@ -639,7 +639,7 @@ export default {
             this.new_participant.budget = null;
             this.new_participant.team = null;
             this.add_participant_modal = false;
-            this.get_players_by_position(this.positions[this.tab].id);
+            this.get_players_by_position_algorithm(this.positions[this.tab].id);
           })
           .catch((err) => {});
       } else {
@@ -659,7 +659,7 @@ export default {
                 this.participants.slice(index + 1, this.participants.length)
               );
             this.add_participant_modal = false;
-            this.get_players_by_position(this.positions[this.tab].id);
+            this.get_players_by_position_algorithm(this.positions[this.tab].id);
           })
           .catch((err) => {});
       }
@@ -672,7 +672,7 @@ export default {
       await this.service
         .deleteRequest(url)
         .then((response) => {
-          this.get_players_by_position(this.positions[this.tab].id);
+          this.get_players_by_position_algorithm(this.positions[this.tab].id);
         })
         .catch((err) => {});
     },

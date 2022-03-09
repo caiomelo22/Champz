@@ -47,33 +47,33 @@ class WebAppTestCase(TestCase):
     #     participants = Participant.objects.all()
     #     self.assertEqual(len(participants), 4)
     #
-    #     kdb.buyPlayer(liverpool, 22)
+    #     kdb.buy_player(liverpool, 22)
     #     self.assertEqual(jorge.budget, 78)
     #     self.assertEqual(kdb.team_participant, liverpool)
     #
-    #     kdb.buyPlayer(city, 22)
+    #     kdb.buy_player(city, 22)
     #     self.assertEqual(caio.budget, 78)
     #     self.assertEqual(jorge.budget, 100)
     #     self.assertEqual(kdb.team_participant, city)
     #
-    #     result = kdb.buyPlayer(united, 101)
+    #     result = kdb.buy_player(united, 101)
     #     self.assertEqual(joao.budget, 100)
     #     self.assertEqual(kdb.team_participant, city)
     #     self.assertEqual(result, False)
     #
-    #     result = kdb.buyPlayer(None, 0)
+    #     result = kdb.buy_player(None, 0)
     #     self.assertEqual(caio.budget, 100)
     #     self.assertEqual(kdb.team_participant, None)
     #     self.assertEqual(result, True)
     #
     #     group_1 = Group.create('1')
-    #     group_1.addTeam(city)
-    #     group_1.addTeam(united)
-    #     group_1.addTeam(liverpool)
-    #     group_1.addTeam(chelsea)
+    #     group_1.add_participant(city)
+    #     group_1.add_participant(united)
+    #     group_1.add_participant(liverpool)
+    #     group_1.add_participant(chelsea)
     #     groups = Group.objects.all()
     #     self.assertEqual(len(groups), 1)
-    #     group_1.createMatches()
+    #     group_1.create_matches()
     #     matches = Match.objects.all()
     #
     #     # print("\nMATCHES:")
@@ -82,7 +82,7 @@ class WebAppTestCase(TestCase):
     #         # print(match)
     #
     #     # print('\nGROUP TABLE:')
-    #     # for participant in group_1.getGroupTable():
+    #     # for participant in group_1.get_group_table():
     #         # print(participant)
     #
     #     self.assertEqual(len(matches), 6)
@@ -93,7 +93,7 @@ class WebAppTestCase(TestCase):
     #     return link[start + 7:end]
     #
     # # Verifica se alguma versão antiga daquele jogador já existe na lista e se existir, devolverá o index dele
-    # def get_jogador_index(self, obj, position):
+    # def get_player_index(self, obj, position):
     #     players = list(Player.objects.filter(position=position))
     #     for player in players:
     #         if obj.name == player.name and int(obj.id) > int(player.id):
@@ -194,7 +194,7 @@ class WebAppTestCase(TestCase):
     #
     #                 # dados['altura'] = ''.join(tds[14].div.findAll(text=True))
     #
-    #                 index = self.get_jogador_index(player, position)
+    #                 index = self.get_player_index(player, position)
     #
     #                 if index >= 0:
     #                     player_to_delete = Player.objects.get(id=index)
@@ -281,10 +281,10 @@ class WebAppTestCase(TestCase):
 
 
         group_1 = self.client.post('/api/group/', {'group': 'Group 1'})
-        result = self.client.post('/api/add_team_group/' + str(group_1.data['id']), {'team': city.data['id']})
-        result = self.client.post('/api/add_team_group/' + str(group_1.data['id']), {'team': united.data['id']})
-        result = self.client.post('/api/add_team_group/' + str(group_1.data['id']), {'team': liverpool.data['id']})
-        result = self.client.post('/api/add_team_group/' + str(group_1.data['id']), {'team': chelsea.data['id']})
+        result = self.client.post('/api/add_participant_group/' + str(group_1.data['id']), {'team': city.data['id']})
+        result = self.client.post('/api/add_participant_group/' + str(group_1.data['id']), {'team': united.data['id']})
+        result = self.client.post('/api/add_participant_group/' + str(group_1.data['id']), {'team': liverpool.data['id']})
+        result = self.client.post('/api/add_participant_group/' + str(group_1.data['id']), {'team': chelsea.data['id']})
         groups = list(Group.objects.all())
         self.assertEqual(len(groups), 1)
         self.assertEqual(len(list(groups[0].teams.all())), 4)

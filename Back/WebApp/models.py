@@ -104,7 +104,7 @@ class Player(models.Model):
         nation=nation, image_path=image, specific_position=spec_pos, likes=likes)
         return player
 
-    def buyPlayer(self, team, price):
+    def buy_player(self, team, price):
         if self.team_participant:
             self.team_participant.participant.budget += self.value
             self.team_participant.participant.save()
@@ -136,43 +136,43 @@ class Player(models.Model):
 class Group(models.Model):
     id = models.AutoField(primary_key=True)
     group = models.CharField(max_length=100)
-    teams = models.ManyToManyField(Team)
+    participants = models.ManyToManyField(Participant)
 
     @classmethod
     def create(cls, group):
         group = Group.objects.create(group=group)
         return group
 
-    def addTeam(self, team):
-        self.teams.add(team)
+    def add_participant(self, participant):
+        self.participants.add(participant)
         self.save()
 
-    def match_exists(self, team_1, team_2):
-        if len(Match.objects.filter(group=self, team_1=team_1, team_2=team_2)) == 1 or \
-                len(Match.objects.filter(group=self, team_1=team_2, team_2=team_1)) == 1:
+    def match_exists(self, participant_1, participant_2):
+        if len(Match.objects.filter(group=self, participant_1=participant_1, participant_2=participant_2)) == 1 or \
+                len(Match.objects.filter(group=self, participant_1=participant_2, participant_2=participant_1)) == 1:
             return True
         return False
 
-    def findMatchGroupParticipantOpponent(self, team):
-        match_1 = Match.objects.filter(group=self, team_1=team)
-        match_2 = Match.objects.filter(group=self, team_2=team)
+    def find_match_group_participant_opponent(self, participant):
+        match_1 = Match.objects.filter(group=self, participant_1=participant)
+        match_2 = Match.objects.filter(group=self, participant_2=participant)
 
         if len(match_1) > 0:
-            return match_1[0].team_2
+            return match_1[0].participant_2
         if len(match_2) > 0:
-            return match_2[0].team_1
+            return match_2[0].participant_1
 
-    def createMatches(self):
-        teams_list = list(self.teams.all())
-        shuffle(teams_list)
+    def create_matches(self):
+        participants_list = list(self.participants.all())
+        shuffle(participants_list)
 
         matches = []
 
-        half = math.floor(len(teams_list)/2)
-        first_half = teams_list[:half]
-        second_half = teams_list[half:]
+        half = math.floor(len(participants_list)/2)
+        first_half = participants_list[:half]
+        second_half = participants_list[half:]
 
-        for i in range(len(teams_list)):
+        for i in range(len(participants_list)):
             for j in range(len(first_half)):
                 matches.append(Match.create(self, first_half[j], list(reversed(second_half))[j]))
             first_half.append(second_half.pop(0))
@@ -180,23 +180,23 @@ class Group(models.Model):
 
         return matches
 
-    def getStats(self, stats, matches, team):
+    def get_stats(self, stats, matches, participant):
         for match in matches:
-            if match.goals_team_1 is not None:
-                if team == match.team_1:
-                    stats['GF'] += match.goals_team_1
-                    stats['GA'] += match.goals_team_2
+            if match.goals_participant_1 is not None:
+                if participant == match.participant_1:
+                    stats['GF'] += match.goals_participant_1
+                    stats['GA'] += match.goals_participant_2
                 else:
-                    stats['GF'] += match.goals_team_2
-                    stats['GA'] += match.goals_team_1
+                    stats['GF'] += match.goals_participant_2
+                    stats['GA'] += match.goals_participant_1
                 stats['GD'] = stats['GF'] - stats['GA']
 
-                if (team == match.team_1 and match.goals_team_1 > match.goals_team_2) or \
-                        (team == match.team_2 and match.goals_team_2 > match.goals_team_1):
+                if (participant == match.participant_1 and match.goals_participant_1 > match.goals_participant_2) or \
+                        (participant == match.participant_2 and match.goals_participant_2 > match.goals_participant_1):
                     stats['P'] += 3
                     stats['W'] += 1
-                elif (team == match.team_1 and match.goals_team_2 > match.goals_team_1) or \
-                        (team == match.team_2 and match.goals_team_1 > match.goals_team_2):
+                elif (participant == match.participant_1 and match.goals_participant_2 > match.goals_participant_1) or \
+                        (participant == match.participant_2 and match.goals_participant_1 > match.goals_participant_2):
                     stats['L'] += 1
                 else:
                     stats['P'] += 1
@@ -204,35 +204,35 @@ class Group(models.Model):
 
         return stats
 
-    def getStatsTeam(self, team):
+    def get_stats_team(self, participant):
         stats = {'P': 0, 'W': 0, 'D': 0, 'L': 0, 'GF': 0, 'GA': 0, 'GD': 0}
         group = self
         if 'Group' in self.group:
             groups = list(Group.objects.all())
-            group = ([g for g in groups if ('Group' in g.group and len(list(g.teams.all())) > 0)])[0]
-        matches = list(Match.objects.filter(team_1=team, group=group))
-        stats = self.getStats(stats, matches, team)
+            group = ([g for g in groups if ('Group' in g.group and len(list(g.participants.all())) > 0)])[0]
+        matches = list(Match.objects.filter(participant_1=participant, group=group))
+        stats = self.get_stats(stats, matches, participant)
 
-        matches = list(Match.objects.filter(team_2=team, group=group))
-        stats = self.getStats(stats, matches, team)
+        matches = list(Match.objects.filter(participant_2=participant, group=group))
+        stats = self.get_stats(stats, matches, participant)
 
         return stats
 
-    def getGroupTable(self):
-        teams_list = list(self.teams.all())
+    def get_group_table(self):
+        participants_list = list(self.participants.all())
         stats = dict()
-        for team in teams_list:
-            stats[team] = self.getStatsTeam(team)
+        for participant in participants_list:
+            stats[participant] = self.get_stats_team(participant)
         stats_list = list(stats.items())
         stats_list = sorted(stats_list, key=lambda x: (x[1]['P'], x[1]['W'], x[1]['GD'], x[1]['GF']), reverse=True)
         return stats_list
 
-    def generateFinalRound(self):
-        teams = self.getGroupTable()
+    def generate_final_round(self):
+        participants = self.get_group_table()
         qualified = list()
 
-        qualified.append(teams[0][0])
-        qualified.append(teams[1][0])
+        qualified.append(participants[0][0])
+        qualified.append(participants[1][0])
 
         matches = []
 
@@ -243,8 +243,8 @@ class Group(models.Model):
             
         final = Group.create('Final')
 
-        for team in qualified:
-            final.addTeam(team)
+        for participant in qualified:
+            final.add_participant(participant)
 
         matches.append(Match.create(final, qualified[0], qualified[1]))
 
@@ -260,15 +260,15 @@ class Group(models.Model):
         strBuilder = ""
         strBuilder += '{}\n'.format(self.group.upper())
         for match in self.matches:
-            team_1 = match.team_1.participant.name
-            team_2 = match.team_2.participant.name
-            goals_1 = match.goals_team_1
+            participant_1 = match.participant_1.participant.name
+            participant_2 = match.participant_2.participant.name
+            goals_1 = match.goals_participant_1
             if goals_1 is None:
                 goals_1 = ''
-            goals_2 = match.goals_team_2
+            goals_2 = match.goals_participant_2
             if goals_2 is None:
                 goals_2 = ''
-            strBuilder += '\t{} {} x {} {}\n'.format(team_1, goals_1, goals_2, team_2)
+            strBuilder += '\t{} {} x {} {}\n'.format(participant_1, goals_1, goals_2, participant_2)
         strBuilder += '\n'
         file.write(strBuilder)
 
@@ -280,21 +280,21 @@ class Group(models.Model):
 
 class Match(models.Model):
     id = models.AutoField(primary_key=True)
-    goals_team_1 = models.IntegerField(null=True)
-    goals_team_2 = models.IntegerField(null=True)
+    goals_participant_1 = models.IntegerField(null=True)
+    goals_participant_2 = models.IntegerField(null=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    team_1 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="team_1")
-    team_2 = models.ForeignKey(Team, on_delete=models.CASCADE, related_name="team_2")
+    participant_1 = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name="participant_1")
+    participant_2 = models.ForeignKey(Participant, on_delete=models.CASCADE, related_name="participant_2")
 
     @classmethod
-    def create(cls, group, team_1, team_2):
-        match = Match.objects.create(group=group, team_1=team_1, team_2=team_2)
+    def create(cls, group, participant_1, participant_2):
+        match = Match.objects.create(group=group, participant_1=participant_1, participant_2=participant_2)
         return match
 
-    def registerScore(self, goals_team_1, goals_team_2):
-        self.goals_team_1 = goals_team_1
-        self.goals_team_2 = goals_team_2
+    def register_score(self, goals_participant_1, goals_participant_2):
+        self.goals_participant_1 = goals_participant_1
+        self.goals_participant_2 = goals_participant_2
         self.save()
 
     def __str__(self):
-        return "{} {} x {} {}".format(self.team_1, self.goals_team_1, self.goals_team_2, self.team_2)
+        return "{} {} x {} {}".format(self.participant_1, self.goals_participant_1, self.goals_participant_2, self.participant_2)

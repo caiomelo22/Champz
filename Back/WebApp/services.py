@@ -20,9 +20,7 @@ def get_id_from_href(link):
     end = link.find('/', start + 8)
     return link[start + 7:end]
 
-
-# Verifica se alguma versão antiga daquele jogador já existe na lista e se existir, devolverá o index dele
-def get_jogador_index(obj, position):
+def get_player_index(obj, position):
     players = list(Player.objects.filter(position=position))
     for player in players:
         if obj.name == player.name:
@@ -205,7 +203,7 @@ def update_teams_leagues():
             except:
                 continue
 
-def getPlayersByPositionAlgorythm(position_id, n):
+def get_players_by_position_algorithm(position_id, n):
     n = int(n)
     position_obj = Position.objects.get(id=position_id)
     players = list(Player.objects.all().order_by('-overall'))
@@ -215,40 +213,40 @@ def getPlayersByPositionAlgorythm(position_id, n):
     return players
 
 
-def colourCell(cell, stat):
-    redFill = PatternFill(start_color='FF0000',
+def colour_cell(cell, stat):
+    red_fill = PatternFill(start_color='FF0000',
                           end_color='FF0000', fill_type='solid')
-    orangeFill = PatternFill(start_color='FF8F00',
+    orange_fill = PatternFill(start_color='FF8F00',
                              end_color='FF8F00', fill_type='solid')
-    yellowFill = PatternFill(start_color='F6EB0A',
+    yellow_fill = PatternFill(start_color='F6EB0A',
                              end_color='F6EB0A', fill_type='solid')
-    lightGreenFill = PatternFill(
+    light_green_fill = PatternFill(
         start_color='2DD63A', end_color='2DD63A', fill_type='solid')
-    greenFill = PatternFill(start_color='3E9C45',
+    green_fill = PatternFill(start_color='3E9C45',
                             end_color='3E9C45', fill_type='solid')
     cell.value = stat
 
     if stat >= 90:
-        cell.fill = greenFill
+        cell.fill = green_fill
     elif stat >= 80:
-        cell.fill = lightGreenFill
+        cell.fill = light_green_fill
     elif stat >= 70:
-        cell.fill = yellowFill
+        cell.fill = yellow_fill
     elif stat >= 60:
-        cell.fill = orangeFill
+        cell.fill = orange_fill
     else:
-        cell.fill = redFill
+        cell.fill = red_fill
 
     return cell
 
 
-def getPlayersByPositionString(sheet, position, n):
-    players = getPlayersByPositionAlgorythm(position.id, n)
-    writePlayersSheet(sheet, players)
+def get_players_by_position_string(sheet, position, n):
+    players = get_players_by_position_algorithm(position.id, n)
+    write_players_sheet(sheet, players)
     return sheet
 
 
-def writePlayersSheet(sheet, players):
+def write_players_sheet(sheet, players):
     sheet.oddHeader.center.size = 14
     sheet.oddHeader.center.font = "Calibri,Bold"
     sheet.cell(row=1, column=1).value = 'PLAYER'
@@ -270,12 +268,12 @@ def writePlayersSheet(sheet, players):
         sheet.cell(row=i+2, column=3).value = player.nation.name
         sheet.cell(row=i+2, column=4).value = player.specific_position
         sheet.cell(row=i+2, column=5).value = player.overall
-        colourCell(sheet.cell(row=i+2, column=6), player.pace)
-        colourCell(sheet.cell(row=i+2, column=7), player.shooting)
-        colourCell(sheet.cell(row=i+2, column=8), player.passing)
-        colourCell(sheet.cell(row=i+2, column=9), player.dribbling)
-        colourCell(sheet.cell(row=i+2, column=10), player.defending)
-        colourCell(sheet.cell(row=i+2, column=11), player.physical)
+        colour_cell(sheet.cell(row=i+2, column=6), player.pace)
+        colour_cell(sheet.cell(row=i+2, column=7), player.shooting)
+        colour_cell(sheet.cell(row=i+2, column=8), player.passing)
+        colour_cell(sheet.cell(row=i+2, column=9), player.dribbling)
+        colour_cell(sheet.cell(row=i+2, column=10), player.defending)
+        colour_cell(sheet.cell(row=i+2, column=11), player.physical)
 
         # if player.value != None:
         sheet.cell(row=i+2, column=12).value = player.value

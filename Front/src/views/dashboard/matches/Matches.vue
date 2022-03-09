@@ -61,7 +61,7 @@
                             style="width: 30px"
                             :src="
                               gs.getTeamImageLink(
-                                getTeamById(team[0].id).image_link
+                                team[0].image_path
                               )
                             "
                           />
@@ -128,7 +128,7 @@
                           style="width: 30px"
                           :src="
                             gs.getTeamImageLink(
-                              getTeamById(match.team_1).image_link
+                              getTeamById(match.team_1).image_path
                             )
                           "
                         />
@@ -138,7 +138,7 @@
                           style="width: 30px"
                           :src="
                             gs.getTeamImageLink(
-                              getTeamById(match.team_2).image_link
+                              getTeamById(match.team_2).image_path
                             )
                           "
                         />
@@ -158,7 +158,7 @@
                           style="width: 30px"
                           :src="
                             gs.getTeamImageLink(
-                              getTeamById(match.team_1).image_link
+                              getTeamById(match.team_1).image_path
                             )
                           "
                         />
@@ -176,7 +176,7 @@
                           style="width: 30px"
                           :src="
                             gs.getTeamImageLink(
-                              getTeamById(match.team_2).image_link
+                              getTeamById(match.team_2).image_path
                             )
                           "
                         />
@@ -381,7 +381,6 @@ export default {
   mounted: function () {
     this.getGroups();
     this.getParticipants();
-    this.getPLTeams();
     // this.initializeGroup();
   },
   methods: {
@@ -402,18 +401,6 @@ export default {
       } else if (!this.currentGroupIndex == 0 && !this.final) {
         this.nextKnockoutStageButtonClick();
       }
-    },
-    getPLTeams: function () {
-      this.service
-        .getRequest("/api/team?league=98")
-        .then((response) => {
-          this.plTeams = response;
-          this.loading = false;
-        })
-        .catch((err) => {
-          this.loading = false;
-          console.log(err);
-        });
     },
     getParticipants: function () {
       this.service
@@ -509,7 +496,7 @@ export default {
             this.getGroupsTable();
           }
         })
-        .catch((err) => {
+        .catch((err) => { 
           console.log(err);
         });
     },
@@ -549,7 +536,7 @@ export default {
     initializeGroup: function () {
       this.loading = true;
       this.service
-        .postRequest("/api/start-champz/2")
+        .postRequest("/api/start-champz/")
         .then((response) => {
           this.getGroups();
           this.resetConfirmationModal = false;

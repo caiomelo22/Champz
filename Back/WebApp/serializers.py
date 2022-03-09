@@ -52,16 +52,16 @@ class PlayerSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
-    teams = TeamSerializer(read_only=True, many=True)
+    participants = ParticipantSerializer(read_only=True, many=True)
     class Meta:
         model = models.Group
-        fields = ['id', 'group', 'teams']
+        fields = ['id', 'group', 'participants']
 
 
 class MatchSerializer(serializers.HyperlinkedModelSerializer):
     group = serializers.PrimaryKeyRelatedField(queryset=models.Group.objects.all())
-    team_1 = TeamSerializer()
-    team_2 = TeamSerializer()
+    participant_1 = ParticipantSerializer()
+    participant_2 = ParticipantSerializer()
     class Meta:
         model = models.Match
-        fields = ['id', 'group', 'goals_team_1', 'goals_team_2', 'team_1', 'team_2']
+        fields = ['id', 'group', 'goals_participant_1', 'goals_participant_2', 'participant_1', 'participant_2']

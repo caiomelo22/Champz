@@ -305,11 +305,11 @@ class StartChampzView(APIView):
         for participant in participants:
             group.add_participant(participant)
         
-        matches = group.create_matches()
+        group.create_matches()
 
         group.export_matches()
 
-        matches = MatchSerializer(matches, many=True).data
+        matches = MatchSerializer(group.matches, many=True).data
 
         return Response(dict(matches=matches, group=group))
 

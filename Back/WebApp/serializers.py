@@ -59,7 +59,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class MatchSerializer(serializers.HyperlinkedModelSerializer):
-    group = serializers.PrimaryKeyRelatedField(queryset=models.Group.objects.all())
+    group = GroupSerializer()
     participant_1 = ParticipantSerializer()
     participant_2 = ParticipantSerializer()
     class Meta:

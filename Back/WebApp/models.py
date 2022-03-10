@@ -178,6 +178,8 @@ class Group(models.Model):
             first_half.append(second_half.pop(0))
             second_half.append(first_half.pop(0))
 
+        self.matches = matches
+
         return matches
 
     def get_stats(self, stats, matches, participant):
@@ -260,8 +262,8 @@ class Group(models.Model):
         strBuilder = ""
         strBuilder += '{}\n'.format(self.group.upper())
         for match in self.matches:
-            participant_1 = match.participant_1.participant.name
-            participant_2 = match.participant_2.participant.name
+            participant_1 = match.participant_1.name
+            participant_2 = match.participant_2.name
             goals_1 = match.goals_participant_1
             if goals_1 is None:
                 goals_1 = ''

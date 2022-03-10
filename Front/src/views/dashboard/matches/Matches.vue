@@ -1,17 +1,5 @@
 <template>
   <v-container v-if="!loading">
-    <!-- <v-btn
-      v-show="choice==false"
-      style="text-align: center;"
-      class="btn btn-success"
-      @click="choice=true; loading=true; initialize_group()"
-    >Generate Group Matches</v-btn>
-    <v-btn
-      v-show="choice==false"
-      style="text-align: center;"
-      class="btn btn-success"
-      @click="choice=true; get_groups();"
-    >Continue With Latest Matchups</v-btn>-->
     <div>
       <v-card style="height: 100%">
         <v-toolbar color="primary" dark>
@@ -55,25 +43,23 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="(team, i) in table" :key="i">
+                      <tr v-for="(participant, i) in table" :key="i">
                         <td class="champzFont">
                           <img
                             style="width: 30px"
-                            :src="gs.getTeamImageLink(team[0].image_path)"
+                            :src="gs.get_team_image_path(participant[0].team.image_path)"
                           />
                           {{
-                            get_team_participant(
-                              team[0].participant
-                            ).name.toUpperCase()
+                              participant[0].name.toUpperCase()
                           }}
                         </td>
-                        <td class="champzFont">{{ team[1].P }}</td>
-                        <td class="champzFont">{{ team[1].W }}</td>
-                        <td class="champzFont">{{ team[1].D }}</td>
-                        <td class="champzFont">{{ team[1].L }}</td>
-                        <td class="champzFont">{{ team[1].GF }}</td>
-                        <td class="champzFont">{{ team[1].GA }}</td>
-                        <td class="champzFont">{{ team[1].GD }}</td>
+                        <td class="champzFont">{{ participant[1].P }}</td>
+                        <td class="champzFont">{{ participant[1].W }}</td>
+                        <td class="champzFont">{{ participant[1].D }}</td>
+                        <td class="champzFont">{{ participant[1].L }}</td>
+                        <td class="champzFont">{{ participant[1].GF }}</td>
+                        <td class="champzFont">{{ participant[1].GA }}</td>
+                        <td class="champzFont">{{ participant[1].GD }}</td>
                       </tr>
                     </tbody>
                     <!-- </template> -->
@@ -110,76 +96,57 @@
                       <td
                         class="champzFont text-center"
                         v-if="
-                          match.goals_team_1 == null &&
-                          match.goals_team_2 == null
+                          match.goals_participant_1 == null &&
+                          match.goals_participant_2 == null
                         "
                       >
                         {{
-                          get_team_participant(
-                            getTeamById(match.team_1).participant
-                          ).name.toUpperCase()
+                          match.participant_1.name.toUpperCase()
                         }}
 
                         <img
                           style="width: 30px"
                           :src="
-                            gs.getTeamImageLink(
-                              getTeamById(match.team_1).image_path
+                            gs.get_team_image_path(
+                              match.participant_1.team.image_path
                             )
                           "
                         />
                         X
-                        <!-- <img style="width:30px;" :src="getTeamById(match.team_2).image_path" /> -->
                         <img
                           style="width: 30px"
                           :src="
-                            gs.getTeamImageLink(
-                              getTeamById(match.team_2).image_path
-                            )
+                            gs.get_team_image_path(match.participant_2.team.image_path)
                           "
                         />
                         {{
-                          get_team_participant(
-                            getTeamById(match.team_2).participant
-                          ).name.toUpperCase()
+                          match.participant_2.name.toUpperCase()
                         }}
                       </td>
                       <td class="champzFont text-center" v-else>
                         {{
-                          get_team_participant(
-                            getTeamById(match.team_1).participant
-                          ).name.toUpperCase()
+                          match.participant_1.name.toUpperCase()
                         }}
                         <img
                           style="width: 30px"
                           :src="
-                            gs.getTeamImageLink(
-                              getTeamById(match.team_1).image_path
+                            gs.get_team_image_path(
+                              match.participant_1.team.image_path
                             )
                           "
                         />
-                        <!-- <img
-                style="width:30px;"
-                :src="getTeamById(match.team_1).image_path"
-                      />-->
-                        {{ match.goals_team_1 }} X
-                        {{ match.goals_team_2 }}
-                        <!-- <img
-                style="width:30px;"
-                :src="getTeamById(match.team_2).image_path"
-                      />-->
+                        {{ match.goals_participant_1 }} X
+                        {{ match.goals_participant_2 }}
                         <img
                           style="width: 30px"
                           :src="
-                            gs.getTeamImageLink(
-                              getTeamById(match.team_2).image_path
+                            gs.get_team_image_path(
+                              match.participant_2.team.image_path
                             )
                           "
                         />
                         {{
-                          get_team_participant(
-                            getTeamById(match.team_2).participant
-                          ).name.toUpperCase()
+                          match.participant_2.name.toUpperCase()
                         }}
                       </td>
                       <td>
@@ -243,9 +210,7 @@
             <v-row>
               <v-col cols="12" md="3">
                 <span class="champzFont mr-2 mt-1" style="float: right">{{
-                  get_team_participant(
-                    getTeamById(current_match.team_1).participant
-                  ).name
+                  current_match.participant_1.name
                 }}</span>
               </v-col>
               <v-col cols="12" md="2">
@@ -253,7 +218,7 @@
                   outlined
                   dense
                   type="number"
-                  v-model="current_match.goals_team_1"
+                  v-model="current_match.goals_participant_1"
                   min="0"
                   required="required"
                 ></v-text-field>
@@ -266,36 +231,17 @@
                   outlined
                   dense
                   type="number"
-                  v-model="current_match.goals_team_2"
+                  v-model="current_match.goals_participant_2"
                   min="0"
                   required="required"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="3">
                 <span class="champzFont ml-3 mt-1" style="float: left">{{
-                  get_team_participant(
-                    getTeamById(current_match.team_2).participant
-                  ).name
+                  current_match.participant_2.name
                 }}</span>
               </v-col>
             </v-row>
-            <!-- <span>{{get_team_participant(getTeamById(current_match.team_1).participant).name}}</span>
-                <v-text-field
-                  style="float: right"
-                  type="number"
-                  v-model="current_match.goals_team_1"
-                  min="0"
-                  required="required"
-                ></v-text-field>
-                <span>X</span>
-                <v-text-field
-                  style="float: left"
-                  type="number"
-                  v-model="current_match.goals_team_2"
-                  min="0"
-                  required="required"
-                ></v-text-field>
-                <span>{{get_team_participant(getTeamById(current_match.team_2).participant).name}}</span> -->
             <v-card-actions>
               <v-btn
                 type="button"
@@ -407,21 +353,6 @@ export default {
         .catch((err) => {
           this.loading = false;
         });
-    },
-    get_team_participant: function (id) {
-      var participant = null;
-      this.participants.forEach((element) => {
-        if (element.id === id) {
-          participant = element;
-          return participant;
-        }
-      });
-      if (participant == null) {
-        participant = {
-          name: "",
-        };
-      }
-      return participant;
     },
     get_match: function (match) {
       this.current_match = JSON.parse(JSON.stringify(match));

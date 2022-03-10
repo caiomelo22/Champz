@@ -63,7 +63,7 @@
                   <td class="champzFont">
                     <img
                       style="width: 30px"
-                      :src="gs.getTeamImageLink(participant.team.image_path)"
+                      :src="gs.get_team_image_path(participant.team.image_path)"
                     />
                     {{ participant.team.name }}
                   </td>
@@ -158,16 +158,16 @@
                   <td class="champzFont">{{ player.id }}</td>
                   <td class="champzFont">
                     <img
-                      :src="gs.getPlayerImageLink(player.image_path)"
+                      :src="gs.get_player_image_path(player.image_path)"
                       style="max-height: 80px"
                     />
                     <img
                       style="width: 30px"
-                      :src="gs.getNationImageLink(player.nation.image_path)"
+                      :src="gs.get_nation_image_path(player.nation.image_path)"
                     />
                     <img
                       style="width: 30px"
-                      :src="gs.getTeamImageLink(player.team_origin.image_path)"
+                      :src="gs.get_team_image_path(player.team_origin.image_path)"
                     />
                   </td>
                   <td class="champzFont">
@@ -295,17 +295,17 @@
                 }}</span>
                 <img
                   style="width: 60px; z-index: 2; margin: auto"
-                  :src="gs.getNationImageLink(current_player.nation.image_path)"
+                  :src="gs.get_nation_image_path(current_player.nation.image_path)"
                 />
                 <img
                   style="width: 60px; z-index: 2; margin: auto"
                   :src="
-                    gs.getTeamImageLink(current_player.team_origin.image_path)
+                    gs.get_team_image_path(current_player.team_origin.image_path)
                   "
                 />
               </div>
               <img
-                :src="gs.getPlayerImageLink(current_player.image_path)"
+                :src="gs.get_player_image_path(current_player.image_path)"
                 style="
                   max-height: 160px;
                   z-index: 2;

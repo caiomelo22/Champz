@@ -4,24 +4,24 @@
       v-show="choice==false"
       style="text-align: center;"
       class="btn btn-success"
-      @click="choice=true; loading=true; initializeGroup()"
+      @click="choice=true; loading=true; initialize_group()"
     >Generate Group Matches</v-btn>
     <v-btn
       v-show="choice==false"
       style="text-align: center;"
       class="btn btn-success"
-      @click="choice=true; getGroups();"
+      @click="choice=true; get_groups();"
     >Continue With Latest Matchups</v-btn>-->
     <div>
       <v-card style="height: 100%">
         <v-toolbar color="primary" dark>
           <v-btn
-            v-if="currentGroupIndex"
+            v-if="current_group_index"
             fab
             text
             large
             @click="
-              currentGroupIndex--;
+              current_group_index--;
               final = false;
             "
           >
@@ -35,7 +35,7 @@
           </v-btn>
         </v-toolbar>
         <v-row>
-          <v-col v-if="currentGroupIndex == 0" cols="12" md="8">
+          <v-col v-if="current_group_index == 0" cols="12" md="8">
             <v-row>
               <v-col cols="12" md="11">
                 <div v-for="(table, index) in tables" :key="index">
@@ -66,7 +66,7 @@
                             "
                           />
                           {{
-                            getTeamParticipant(
+                            get_team_participant(
                               team[0].participant
                             ).name.toUpperCase()
                           }}
@@ -92,8 +92,8 @@
           </v-col>
           <v-col
             cols="12"
-            :md="currentGroupIndex ? 12 : 4"
-            :class="currentGroupIndex ? 'champzKnockout' : 'champzMatches'"
+            :md="current_group_index ? 12 : 4"
+            :class="current_group_index ? 'champzKnockout' : 'champzMatches'"
           >
             <div
               v-for="group in get_dashboard_matches()"
@@ -101,7 +101,7 @@
               class="mt-3"
             >
               <h5 class="text-center">{{ group.group }}</h5>
-              <v-simple-table :class="currentGroupIndex ? 'mx-8' : 'mr-0'">
+              <v-simple-table :class="current_group_index ? 'mx-8' : 'mr-0'">
                 <template v-slot:default>
                   <thead class="thead-dark">
                     <tr>
@@ -119,7 +119,7 @@
                         "
                       >
                         {{
-                          getTeamParticipant(
+                          get_team_participant(
                             getTeamById(match.team_1).participant
                           ).name.toUpperCase()
                         }}
@@ -143,14 +143,14 @@
                           "
                         />
                         {{
-                          getTeamParticipant(
+                          get_team_participant(
                             getTeamById(match.team_2).participant
                           ).name.toUpperCase()
                         }}
                       </td>
                       <td class="champzFont text-center" v-else>
                         {{
-                          getTeamParticipant(
+                          get_team_participant(
                             getTeamById(match.team_1).participant
                           ).name.toUpperCase()
                         }}
@@ -181,7 +181,7 @@
                           "
                         />
                         {{
-                          getTeamParticipant(
+                          get_team_participant(
                             getTeamById(match.team_2).participant
                           ).name.toUpperCase()
                         }}
@@ -191,7 +191,7 @@
                           small
                           fab
                           color="primary"
-                          @click="getMatch(match)"
+                          @click="get_match(match)"
                         >
                           <v-icon small>mdi-pencil</v-icon>
                         </v-btn>
@@ -211,14 +211,14 @@
             light
             color="primary"
             v-if="final"
-            v-on:click="generateChampzFile()"
+            v-on:click="generate_champz_file()"
             >Generate Champz File</v-btn
           >
         </div>
       </v-card>
       <v-spacer></v-spacer>
-      <a @click="resetConfirmationModal = true">Reset matches</a>
-      <v-dialog v-model="resetConfirmationModal" width="40%">
+      <a @click="reset_confirmation_dialog = true">Reset matches</a>
+      <v-dialog v-model="reset_confirmation_dialog" width="40%">
         <v-card>
           <v-card-title>
             <h3>
@@ -228,7 +228,7 @@
           </v-card-title>
           <v-card-text>
             <v-card-actions class="text-center">
-              <v-btn class="mx-auto" color="red" @click="initializeGroup()"
+              <v-btn class="mx-auto" color="red" @click="initialize_group()"
                 >Reset</v-btn
               >
             </v-card-actions>
@@ -237,18 +237,18 @@
       </v-dialog>
     </div>
     <!-- Register Score Modal -->
-    <v-dialog v-model="registerScoreModal" width="40%">
+    <v-dialog v-model="register_score_dialog" width="40%">
       <v-card>
         <v-card-title>
           <h5>REGISTER SCORE</h5>
         </v-card-title>
         <v-card-text>
-          <form v-on:submit.prevent="registerScore()">
+          <form v-on:submit.prevent="register_score()">
             <v-row>
               <v-col cols="12" md="3">
                 <span class="champzFont mr-2 mt-1" style="float: right">{{
-                  getTeamParticipant(
-                    getTeamById(currentMatch.team_1).participant
+                  get_team_participant(
+                    getTeamById(current_match.team_1).participant
                   ).name
                 }}</span>
               </v-col>
@@ -257,7 +257,7 @@
                   outlined
                   dense
                   type="number"
-                  v-model="currentMatch.goals_team_1"
+                  v-model="current_match.goals_team_1"
                   min="0"
                   required="required"
                 ></v-text-field>
@@ -270,24 +270,24 @@
                   outlined
                   dense
                   type="number"
-                  v-model="currentMatch.goals_team_2"
+                  v-model="current_match.goals_team_2"
                   min="0"
                   required="required"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="3">
                 <span class="champzFont ml-3 mt-1" style="float: left">{{
-                  getTeamParticipant(
-                    getTeamById(currentMatch.team_2).participant
+                  get_team_participant(
+                    getTeamById(current_match.team_2).participant
                   ).name
                 }}</span>
               </v-col>
             </v-row>
-            <!-- <span>{{getTeamParticipant(getTeamById(currentMatch.team_1).participant).name}}</span>
+            <!-- <span>{{get_team_participant(getTeamById(current_match.team_1).participant).name}}</span>
                 <v-text-field
                   style="float: right"
                   type="number"
-                  v-model="currentMatch.goals_team_1"
+                  v-model="current_match.goals_team_1"
                   min="0"
                   required="required"
                 ></v-text-field>
@@ -295,16 +295,16 @@
                 <v-text-field
                   style="float: left"
                   type="number"
-                  v-model="currentMatch.goals_team_2"
+                  v-model="current_match.goals_team_2"
                   min="0"
                   required="required"
                 ></v-text-field>
-                <span>{{getTeamParticipant(getTeamById(currentMatch.team_2).participant).name}}</span> -->
+                <span>{{get_team_participant(getTeamById(current_match.team_2).participant).name}}</span> -->
             <v-card-actions>
               <v-btn
                 type="button"
                 color="red"
-                @click="registerScoreModal = false"
+                @click="register_score_dialog = false"
                 >Close</v-btn
               >
               <v-btn type="submit" color="green">Save changes</v-btn>
@@ -365,44 +365,43 @@ export default {
     loading: true,
     choice: false,
     final: false,
-    registerScoreModal: false,
-    resetConfirmationModal: false,
+    register_score_dialog: false,
+    reset_confirmation_dialog: false,
     participants: [],
-    groupMatches: [],
-    plTeams: [],
+    group_matches: [],
     groups: [],
     matches: [],
     table: [],
     tables: [],
-    currentMatch: {},
-    currentGroupIndex: 0,
-    currentGroup: {},
+    current_match: {},
+    current_group_index: 0,
+    current_group: {},
   }),
   mounted: function () {
-    this.getGroups();
-    this.getParticipants();
-    // this.initializeGroup();
+    this.get_groups();
+    this.get_participants();
+    // this.initialize_group();
   },
   methods: {
     get_dashboard_matches() {
-      if (this.currentGroupIndex == 0) {
+      if (this.current_group_index == 0) {
         return this.groups.filter((x) => x.group.includes("Group"));
-      } else if (this.currentGroupIndex == 1) {
+      } else if (this.current_group_index == 1) {
         return this.groups.filter((x) => x.group.includes("Wildcard"));
-      } else if (this.currentGroupIndex == 2) {
+      } else if (this.current_group_index == 2) {
         return this.groups.filter((x) => x.group.includes("Semi"));
-      } else if (this.currentGroupIndex == 3) {
+      } else if (this.current_group_index == 3) {
         return this.groups.filter((x) => x.group.includes("Final"));
       }
     },
     next_stage_click() {
-      if (this.currentGroupIndex == 0) {
-        this.knockoutStageButtonClick();
-      } else if (!this.currentGroupIndex == 0 && !this.final) {
-        this.nextKnockoutStageButtonClick();
+      if (this.current_group_index == 0) {
+        this.knockout_stage_btn_click();
+      } else if (!this.current_group_index == 0 && !this.final) {
+        this.next_knockout_stage_btn_click();
       }
     },
-    getParticipants: function () {
+    get_participants: function () {
       this.service
         .getRequest("/api/participant/")
         .then((response) => {
@@ -415,7 +414,7 @@ export default {
           console.log(err);
         });
     },
-    getTeamParticipant: function (id) {
+    get_team_participant: function (id) {
       var participant = null;
       this.participants.forEach((element) => {
         if (element.id === id) {
@@ -430,90 +429,45 @@ export default {
       }
       return participant;
     },
-    getTeamById: function (id) {
-      var team = {};
-      this.plTeams.forEach((element) => {
-        if (element.id === id) {
-          team = element;
-          return team;
-        }
-      });
-      return team;
+    get_match: function (match) {
+      this.current_match = JSON.parse(JSON.stringify(match));
+      this.register_score_dialog = true;
     },
-    getMatch: function (match) {
-      this.currentMatch = Object.assign({}, match);
-      this.registerScoreModal = true;
-
-      // this.loading = true;
-      // url = "/api/match/" + id + "/";
-      // this.service
-      //   .get(url)
-      //   .then((response) => {
-      //     this.currentMatch = response.data;
-      //     $("#registerScoreModal").modal("show");
-      //     this.loading = false;
-      //   })
-      //   .catch((err) => {
-      //     this.loading = false;
-      //     console.log(err);
-      //   });
-    },
-    deleteGroups: function () {
-      var i;
-      var groupsToDelete = this.groups.slice(this.currentGroupIndex + 1);
-      for (i = 0; i < groupsToDelete.length; i++) {
-        this.deleteGroup(groupsToDelete[i].id);
-      }
-    },
-    deleteGroup: function (id) {
-      this.loading = true;
-      var url = "/api/group/" + id + "/";
-      this.service
-        .deleteRequest(url)
-        .then((response) => {
-          this.loading = false;
-          this.getGroups();
-        })
-        .catch((err) => {
-          this.loading = false;
-          console.log(err);
-        });
-    },
-    registerScore: function () {
-      var groupIndex = this.groups
+    register_score: function () {
+      var group_index = this.groups
         .map((x) => x.id)
-        .indexOf(this.currentMatch.group);
-      var matchIndex = this.groups[groupIndex].matches
+        .indexOf(this.current_match.group);
+      var match_index = this.groups[group_index].matches
         .map((x) => x.id)
-        .indexOf(this.currentMatch.id);
-      this.groups[groupIndex].matches[matchIndex] = this.currentMatch;
-      var url = "/api/match/" + this.currentMatch.id + "/";
-      this.registerScoreModal = false;
+        .indexOf(this.current_match.id);
+      this.groups[group_index].matches[match_index] = this.current_match;
+      var url = "/api/match/" + this.current_match.id + "/";
+      this.register_score_dialog = false;
       this.service
-        .patchRequest(url, this.currentMatch)
+        .patchRequest(url, this.current_match)
         .then((response) => {
-          if (this.currentGroupIndex == 0) {
-            this.getGroupsTable();
+          if (this.current_group_index == 0) {
+            this.get_groups_table();
           }
         })
         .catch((err) => { 
           console.log(err);
         });
     },
-    getGroups: function () {
+    get_groups: function () {
       this.loading = true;
       this.service
         .getRequest("/api/group/")
         .then((response) => {
           this.groups = response;
           if (this.groups.length == 0) {
-            this.initializeGroup();
+            this.initialize_group();
           } else {
             this.groups.forEach((element) => {
               element.matches = [];
             });
-            this.getMatches();
-            this.getGroupsTable();
+            this.get_matches();
+            this.get_groups_table();
           }
         })
         .catch((err) => {
@@ -521,7 +475,7 @@ export default {
           console.log(err);
         });
     },
-    getGroupsTable: function () {
+    get_groups_table: function () {
       this.service
         .getRequest("/api/tables/")
         .then((response) => {
@@ -533,103 +487,90 @@ export default {
           console.log(err);
         });
     },
-    initializeGroup: function () {
+    initialize_group: function () {
       this.loading = true;
       this.service
         .postRequest("/api/start-champz/")
         .then((response) => {
-          this.getGroups();
-          this.resetConfirmationModal = false;
+          this.get_groups();
+          this.reset_confirmation_dialog = false;
         })
         .catch((err) => {
           this.loading = false;
           console.log(err);
         });
     },
-    knockoutStageButtonClick: function () {
+    knockout_stage_btn_click: function () {
       if (this.groups.filter((x) => x.group.includes("Wildcard")).length > 1) {
-        this.currentGroupIndex += 1;
+        this.current_group_index += 1;
       } else {
         this.loading = true;
-        this.generateWildcard();
+        this.generate_wildcard();
       }
     },
     get_group_title() {
-      if (this.currentGroupIndex == 0) {
+      if (this.current_group_index == 0) {
         return "Group Stage";
-      } else if (this.currentGroupIndex == 1) {
+      } else if (this.current_group_index == 1) {
         return "Wildcard";
-      } else if (this.currentGroupIndex == 2) {
+      } else if (this.current_group_index == 2) {
         return "Semis";
       } else {
         return "Finals";
       }
     },
-    nextKnockoutStageButtonClick: function () {
+    next_knockout_stage_btn_click: function () {
       if (
-        this.currentGroupIndex == 1 &&
+        this.current_group_index == 1 &&
         this.groups.filter((x) => x.group.includes("Semi")).length == 0
       ) {
-        this.generateSemis();
+        this.generate_semis();
       } else if (
-        this.currentGroupIndex == 2 &&
+        this.current_group_index == 2 &&
         this.groups.filter((x) => x.group.includes("Final")).length == 0
       ) {
-        this.generateFinal();
+        this.generate_final();
       } else {
-        this.currentGroupIndex += 1;
+        this.current_group_index += 1;
       }
-      if (this.currentGroupIndex == 3) {
+      if (this.current_group_index == 3) {
         this.final = true;
       }
     },
-    generateFirstKnockout: function () {
-      this.loading = true;
-      this.service
-        .postRequest("/api/generate_1st_knockout/")
-        .then((response) => {
-          this.currentGroupIndex += 1;
-          this.getGroups();
-        })
-        .catch((err) => {
-          this.loading = false;
-          console.log(err);
-        });
-    },
-    generateWildcard: function () {
+    generate_wildcard: function () {
       this.loading = true;
       this.service
         .postRequest("/api/generate_wildcards/")
         .then((response) => {
           console.log(response);
-          this.currentGroupIndex += 1;
-          this.getGroups();
+          this.current_group_index += 1;
+          this.get_groups();
         })
         .catch((err) => {
           this.loading = false;
           console.log(err);
         });
     },
-    generateSemis: function () {
+    generate_semis: function () {
       this.loading = true;
       this.service
         .postRequest("/api/generate_semis/")
         .then((response) => {
-          this.currentGroupIndex += 1;
-          this.getGroups();
+          this.current_group_index += 1;
+          this.get_groups();
         })
         .catch((err) => {
           this.loading = false;
           console.log(err);
         });
     },
-    generateFinal: function () {
+    generate_final: function () {
       this.loading = true;
       this.service
         .postRequest("/api/generate_final")
         .then((response) => {
-          this.getGroups();
-          this.currentGroupIndex += 1;
+          this.get_groups();
+          this.current_group_index += 1;
           this.final = true;
         })
         .catch((err) => {
@@ -637,7 +578,7 @@ export default {
           console.log(err);
         });
     },
-    generateChampzFile: function () {
+    generate_champz_file: function () {
       this.loading = true;
       this.service
         .postRequest("/api/end_champz/")
@@ -649,7 +590,7 @@ export default {
           console.log(err);
         });
     },
-    matchToGroup: function (match) {
+    match_to_group: function (match) {
       this.groups.forEach((element) => {
         if (match.group == element.id) {
           element.matches.push(match);
@@ -657,14 +598,14 @@ export default {
         }
       });
     },
-    getMatches: function () {
+    get_matches: function () {
       this.loading = true;
       this.service
         .getRequest("/api/match/")
         .then((response) => {
           this.matches = response;
           this.matches.forEach((element) => {
-            this.matchToGroup(element);
+            this.match_to_group(element);
           });
         })
         .catch((err) => {

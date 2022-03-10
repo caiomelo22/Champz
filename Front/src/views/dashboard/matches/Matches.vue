@@ -59,11 +59,7 @@
                         <td class="champzFont">
                           <img
                             style="width: 30px"
-                            :src="
-                              gs.getTeamImageLink(
-                                team[0].image_path
-                              )
-                            "
+                            :src="gs.getTeamImageLink(team[0].image_path)"
                           />
                           {{
                             get_team_participant(
@@ -405,13 +401,11 @@ export default {
       this.service
         .getRequest("/api/participant/")
         .then((response) => {
-          console.log(response);
           this.participants = response;
           this.loading = false;
         })
         .catch((err) => {
           this.loading = false;
-          console.log(err);
         });
     },
     get_team_participant: function (id) {
@@ -450,9 +444,7 @@ export default {
             this.get_groups_table();
           }
         })
-        .catch((err) => { 
-          console.log(err);
-        });
+        .catch((err) => {});
     },
     get_groups: function () {
       this.loading = true;
@@ -472,7 +464,6 @@ export default {
         })
         .catch((err) => {
           this.loading = false;
-          console.log(err);
         });
     },
     get_groups_table: function () {
@@ -484,7 +475,6 @@ export default {
         })
         .catch((err) => {
           this.loading = false;
-          console.log(err);
         });
     },
     initialize_group: function () {
@@ -497,7 +487,6 @@ export default {
         })
         .catch((err) => {
           this.loading = false;
-          console.log(err);
         });
     },
     knockout_stage_btn_click: function () {
@@ -542,13 +531,11 @@ export default {
       this.service
         .postRequest("/api/generate_wildcards/")
         .then((response) => {
-          console.log(response);
           this.current_group_index += 1;
           this.get_groups();
         })
         .catch((err) => {
           this.loading = false;
-          console.log(err);
         });
     },
     generate_semis: function () {
@@ -561,7 +548,6 @@ export default {
         })
         .catch((err) => {
           this.loading = false;
-          console.log(err);
         });
     },
     generate_final: function () {
@@ -575,7 +561,6 @@ export default {
         })
         .catch((err) => {
           this.loading = false;
-          console.log(err);
         });
     },
     generate_champz_file: function () {
@@ -587,7 +572,6 @@ export default {
         })
         .catch((err) => {
           this.loading = false;
-          console.log(err);
         });
     },
     match_to_group: function (match) {
@@ -610,7 +594,6 @@ export default {
         })
         .catch((err) => {
           this.loading = false;
-          console.log(err);
         });
     },
   },

@@ -319,9 +319,9 @@ export default {
     current_group_index: 0,
     current_group: {},
   }),
-  mounted: function () {
-    this.get_groups();
-    this.get_participants();
+  async created () {
+    await this.get_groups();
+    await this.get_participants();
     // this.initialize_group();
   },
   methods: {
@@ -336,15 +336,15 @@ export default {
         return this.groups.filter((x) => x.group.includes("Final"));
       }
     },
-    next_stage_click() {
+    async next_stage_click() {
       if (this.current_group_index == 0) {
-        this.knockout_stage_btn_click();
+        await this.knockout_stage_btn_click();
       } else if (!this.current_group_index == 0 && !this.final) {
-        this.next_knockout_stage_btn_click();
+        await this.next_knockout_stage_btn_click();
       }
     },
-    get_participants: function () {
-      this.service
+    get_participants: async function () {
+      await this.service
         .getRequest("/api/participant/")
         .then((response) => {
           this.participants = response;
@@ -358,7 +358,7 @@ export default {
       this.current_match = JSON.parse(JSON.stringify(match));
       this.register_score_dialog = true;
     },
-    register_score: function () {
+    register_score: async function () {
       var group_index = this.groups
         .map((x) => x.id)
         .indexOf(this.current_match.group);
@@ -368,7 +368,7 @@ export default {
       this.groups[group_index].matches[match_index] = this.current_match;
       var url = "/api/match/" + this.current_match.id + "/";
       this.register_score_dialog = false;
-      this.service
+      await this.service
         .patchRequest(url, this.current_match)
         .then((response) => {
           if (this.current_group_index == 0) {
@@ -377,9 +377,9 @@ export default {
         })
         .catch((err) => {});
     },
-    get_groups: function () {
+    get_groups: async function () {
       this.loading = true;
-      this.service
+      await this.service
         .getRequest("/api/group/")
         .then((response) => {
           this.groups = response;
@@ -397,8 +397,8 @@ export default {
           this.loading = false;
         });
     },
-    get_groups_table: function () {
-      this.service
+    get_groups_table: async function () {
+      await this.service
         .getRequest("/api/tables/")
         .then((response) => {
           this.tables = response;
@@ -408,9 +408,9 @@ export default {
           this.loading = false;
         });
     },
-    initialize_group: function () {
+    initialize_group: async function () {
       this.loading = true;
-      this.service
+      await this.service
         .postRequest("/api/start-champz/")
         .then((response) => {
           this.get_groups();
@@ -420,12 +420,12 @@ export default {
           this.loading = false;
         });
     },
-    knockout_stage_btn_click: function () {
+    knockout_stage_btn_click: async function () {
       if (this.groups.filter((x) => x.group.includes("Wildcard")).length > 1) {
         this.current_group_index += 1;
       } else {
         this.loading = true;
-        this.generate_wildcard();
+        await this.generate_wildcard();
       }
     },
     get_group_title() {
@@ -439,17 +439,17 @@ export default {
         return "Finals";
       }
     },
-    next_knockout_stage_btn_click: function () {
+    next_knockout_stage_btn_click: async function () {
       if (
         this.current_group_index == 1 &&
         this.groups.filter((x) => x.group.includes("Semi")).length == 0
       ) {
-        this.generate_semis();
+        await this.generate_semis();
       } else if (
         this.current_group_index == 2 &&
         this.groups.filter((x) => x.group.includes("Final")).length == 0
       ) {
-        this.generate_final();
+        await this.generate_final();
       } else {
         this.current_group_index += 1;
       }
@@ -457,9 +457,9 @@ export default {
         this.final = true;
       }
     },
-    generate_wildcard: function () {
+    generate_wildcard: async function () {
       this.loading = true;
-      this.service
+      await this.service
         .postRequest("/api/generate_wildcards/")
         .then((response) => {
           this.current_group_index += 1;
@@ -469,9 +469,9 @@ export default {
           this.loading = false;
         });
     },
-    generate_semis: function () {
+    generate_semis: async function () {
       this.loading = true;
-      this.service
+      await this.service
         .postRequest("/api/generate_semis/")
         .then((response) => {
           this.current_group_index += 1;
@@ -481,9 +481,9 @@ export default {
           this.loading = false;
         });
     },
-    generate_final: function () {
+    generate_final: async function () {
       this.loading = true;
-      this.service
+      await this.service
         .postRequest("/api/generate_final")
         .then((response) => {
           this.get_groups();
@@ -494,9 +494,9 @@ export default {
           this.loading = false;
         });
     },
-    generate_champz_file: function () {
+    generate_champz_file: async function () {
       this.loading = true;
-      this.service
+      await this.service
         .postRequest("/api/end_champz/")
         .then((response) => {
           this.loading = false;
@@ -513,9 +513,9 @@ export default {
         }
       });
     },
-    get_matches: function () {
+    get_matches: async function () {
       this.loading = true;
-      this.service
+      await this.service
         .getRequest("/api/match/")
         .then((response) => {
           this.matches = response;

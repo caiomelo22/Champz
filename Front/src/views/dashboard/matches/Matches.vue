@@ -309,7 +309,6 @@ export default {
     final: false,
     register_score_dialog: false,
     reset_confirmation_dialog: false,
-    participants: [],
     group_matches: [],
     groups: [],
     matches: [],
@@ -321,8 +320,6 @@ export default {
   }),
   async created () {
     await this.get_groups();
-    await this.get_participants();
-    // this.initialize_group();
   },
   methods: {
     get_dashboard_matches() {
@@ -343,17 +340,6 @@ export default {
         await this.next_knockout_stage_btn_click();
       }
     },
-    get_participants: async function () {
-      await this.service
-        .getRequest("/api/participant/")
-        .then((response) => {
-          this.participants = response;
-          this.loading = false;
-        })
-        .catch((err) => {
-          this.loading = false;
-        });
-    },
     get_match: function (match) {
       this.current_match = JSON.parse(JSON.stringify(match));
       this.register_score_dialog = true;
@@ -371,9 +357,6 @@ export default {
       await this.service
         .patchRequest(url, this.current_match)
         .then((response) => {
-          if (this.current_group_index == 0) {
-            this.get_groups_table();
-          }
         })
         .catch((err) => {});
     },
@@ -386,23 +369,8 @@ export default {
           if (this.groups.length == 0) {
             this.initialize_group();
           } else {
-            this.groups.forEach((element) => {
-              element.matches = [];
-            });
-            this.get_matches();
             this.get_groups_table();
           }
-        })
-        .catch((err) => {
-          this.loading = false;
-        });
-    },
-    get_groups_table: async function () {
-      await this.service
-        .getRequest("/api/tables/")
-        .then((response) => {
-          this.tables = response;
-          this.loading = false;
         })
         .catch((err) => {
           this.loading = false;
@@ -413,7 +381,6 @@ export default {
       await this.service
         .postRequest("/api/start-champz/")
         .then((response) => {
-          this.get_groups();
           this.reset_confirmation_dialog = false;
         })
         .catch((err) => {
@@ -500,28 +467,6 @@ export default {
         .postRequest("/api/end_champz/")
         .then((response) => {
           this.loading = false;
-        })
-        .catch((err) => {
-          this.loading = false;
-        });
-    },
-    match_to_group: function (match) {
-      this.groups.forEach((element) => {
-        if (match.group == element.id) {
-          element.matches.push(match);
-          return;
-        }
-      });
-    },
-    get_matches: async function () {
-      this.loading = true;
-      await this.service
-        .getRequest("/api/match/")
-        .then((response) => {
-          this.matches = response;
-          this.matches.forEach((element) => {
-            this.match_to_group(element);
-          });
         })
         .catch((err) => {
           this.loading = false;

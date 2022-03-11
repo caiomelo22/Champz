@@ -147,21 +147,6 @@ class Group(models.Model):
         self.participants.add(participant)
         self.save()
 
-    def match_exists(self, participant_1, participant_2):
-        if len(Match.objects.filter(group=self, participant_1=participant_1, participant_2=participant_2)) == 1 or \
-                len(Match.objects.filter(group=self, participant_1=participant_2, participant_2=participant_1)) == 1:
-            return True
-        return False
-
-    def find_match_group_participant_opponent(self, participant):
-        match_1 = Match.objects.filter(group=self, participant_1=participant)
-        match_2 = Match.objects.filter(group=self, participant_2=participant)
-
-        if len(match_1) > 0:
-            return match_1[0].participant_2
-        if len(match_2) > 0:
-            return match_2[0].participant_1
-
     def create_matches(self):
         participants_list = list(self.participants.all())
         shuffle(participants_list)
@@ -182,49 +167,41 @@ class Group(models.Model):
 
         return matches
 
-    def get_stats(self, stats, matches, participant):
-        for match in matches:
-            if match.goals_participant_1 is not None:
-                if participant == match.participant_1:
-                    stats['GF'] += match.goals_participant_1
-                    stats['GA'] += match.goals_participant_2
-                else:
-                    stats['GF'] += match.goals_participant_2
-                    stats['GA'] += match.goals_participant_1
-                stats['GD'] = stats['GF'] - stats['GA']
-
-                if (participant == match.participant_1 and match.goals_participant_1 > match.goals_participant_2) or \
-                        (participant == match.participant_2 and match.goals_participant_2 > match.goals_participant_1):
-                    stats['P'] += 3
-                    stats['W'] += 1
-                elif (participant == match.participant_1 and match.goals_participant_2 > match.goals_participant_1) or \
-                        (participant == match.participant_2 and match.goals_participant_1 > match.goals_participant_2):
-                    stats['L'] += 1
-                else:
-                    stats['P'] += 1
-                    stats['D'] += 1
-
+    def set_game_stats(self, stats_participant, goals_for, goals_against):
+        stats_participant['GF'] += goals_for
+        stats_participant['GA'] += goals_against
+        stats_participant['GD'] += stats_participant['GF'] - stats_participant['GA']
+        return stats_participant
+    
+    def set_record_stats(self, stats, winner, loser):
+        stats[winner]['P'] += 3
+        stats[winner]['W'] += 1
+        stats[loser]['L'] += 1
         return stats
 
-    def get_stats_team(self, participant):
-        stats = {'P': 0, 'W': 0, 'D': 0, 'L': 0, 'GF': 0, 'GA': 0, 'GD': 0}
-        group = self
-        if 'Group' in self.group:
-            groups = list(Group.objects.all())
-            group = ([g for g in groups if ('Group' in g.group and len(list(g.participants.all())) > 0)])[0]
-        matches = list(Match.objects.filter(participant_1=participant, group=group))
-        stats = self.get_stats(stats, matches, participant)
-
-        matches = list(Match.objects.filter(participant_2=participant, group=group))
-        stats = self.get_stats(stats, matches, participant)
-
-        return stats
+    def set_draw_stats(self, stats_participant, participant):
+        stats_participant['P'] += 1
+        stats_participant['D'] += 1
+        return stats_participant
 
     def get_group_table(self):
-        participants_list = list(self.participants.all())
-        stats = dict()
-        for participant in participants_list:
-            stats[participant] = self.get_stats_team(participant)
+        participants = list(self.participants.all())
+        stats = dict((p,{'P': 0, 'W': 0, 'D': 0, 'L': 0, 'GF': 0, 'GA': 0, 'GD': 0}) for p in participants)
+
+        matches = list(Match.objects.filter(group=self))
+        for match in matches:
+            if match.goals_participant_1 != None and match.goals_participant_2 != None:
+                stats[match.participant_1] = self.set_game_stats(stats[match.participant_1], match.goals_participant_1, match.goals_participant_2)
+                stats[match.participant_2] = self.set_game_stats(stats[match.participant_2], match.goals_participant_2, match.goals_participant_1)
+                if match.goals_participant_1 > match.goals_participant_2:
+                    stats = self.set_record_stats(stats, match.participant_1, match.participant_2)
+                elif match.goals_participant_2 > match.goals_participant_1:
+                    stats = self.set_record_stats(stats, match.participant_2, match.participant_1)
+                else:
+                    stats[match.participant_1] = self.set_draw_stats(stats[match.participant_1], match.participant_1)
+                    stats[match.participant_2] = self.set_draw_stats(stats[match.participant_2], match.participant_2)
+
+        print(stats)
         stats_list = list(stats.items())
         stats_list = sorted(stats_list, key=lambda x: (x[1]['P'], x[1]['W'], x[1]['GD'], x[1]['GF']), reverse=True)
         return stats_list

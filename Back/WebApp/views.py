@@ -309,9 +309,7 @@ class StartChampzView(APIView):
 
         group.export_matches()
 
-        matches = MatchSerializer(group.matches, many=True).data
-
-        return Response(dict(matches=matches, group=group))
+        return Response(GroupSerializer(group).data)
 
 class GetGroupTableView(APIView):
     def get(self, request, id):

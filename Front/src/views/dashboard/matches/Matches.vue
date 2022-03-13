@@ -9,18 +9,16 @@
         <v-toolbar color="primary" dark>
           <v-btn
             :disabled="!current_group_index"
-            fab
-            text
-            large
+            icon
             @click="previous_stage_click"
           >
-            <v-icon dark large>mdi-chevron-left</v-icon>
+            <v-icon>mdi-chevron-left</v-icon>
           </v-btn>
           <v-toolbar-title class="mx-auto">{{
             selected_group.name
           }}</v-toolbar-title>
-          <v-btn fab text large @click="next_stage_click">
-            <v-icon dark large>mdi-chevron-right</v-icon>
+          <v-btn icon @click="next_stage_click" class="mr-2">
+            <v-icon>mdi-chevron-right</v-icon>
           </v-btn>
         </v-toolbar>
         <v-row
@@ -36,23 +34,22 @@
           <v-col v-if="current_group_index == 0" cols="12" md="8">
             <v-row>
               <v-col cols="12" md="11">
-                <h4 class="text-center my-6">{{ selected_group.name }}</h4>
-                <table class="table table-striped ml-7">
+                <table class="table table-striped">
                   <thead>
                     <tr>
-                      <th class="champzFont" scope="col">Team</th>
-                      <th class="champzFont" scope="col">P</th>
-                      <th class="champzFont" scope="col">W</th>
-                      <th class="champzFont" scope="col">D</th>
-                      <th class="champzFont" scope="col">L</th>
-                      <th class="champzFont" scope="col">GF</th>
-                      <th class="champzFont" scope="col">GA</th>
-                      <th class="champzFont" scope="col">GD</th>
+                      <th class="champz-font" scope="col">Team</th>
+                      <th class="champz-font" scope="col">P</th>
+                      <th class="champz-font" scope="col">W</th>
+                      <th class="champz-font" scope="col">D</th>
+                      <th class="champz-font" scope="col">L</th>
+                      <th class="champz-font" scope="col">GF</th>
+                      <th class="champz-font" scope="col">GA</th>
+                      <th class="champz-font" scope="col">GD</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="(participant, i) in table" :key="i">
-                      <td class="champzFont">
+                      <td class="champz-font">
                         <img
                           style="width: 30px"
                           :src="
@@ -63,47 +60,46 @@
                         />
                         {{ participant[0].name.toUpperCase() }}
                       </td>
-                      <td class="champzFont">{{ participant[1].P }}</td>
-                      <td class="champzFont">{{ participant[1].W }}</td>
-                      <td class="champzFont">{{ participant[1].D }}</td>
-                      <td class="champzFont">{{ participant[1].L }}</td>
-                      <td class="champzFont">{{ participant[1].GF }}</td>
-                      <td class="champzFont">{{ participant[1].GA }}</td>
-                      <td class="champzFont">{{ participant[1].GD }}</td>
+                      <td class="champz-font">{{ participant[1].P }}</td>
+                      <td class="champz-font">{{ participant[1].W }}</td>
+                      <td class="champz-font">{{ participant[1].D }}</td>
+                      <td class="champz-font">{{ participant[1].L }}</td>
+                      <td class="champz-font">{{ participant[1].GF }}</td>
+                      <td class="champz-font">{{ participant[1].GA }}</td>
+                      <td class="champz-font">{{ participant[1].GD }}</td>
                     </tr>
                   </tbody>
                 </table>
                 <v-divider></v-divider>
               </v-col>
-              <v-col cols="12" md="1" class="champzDivider">
-                <v-divider class="ml-8" vertical></v-divider>
+              <v-col cols="12" md="1" class="champz-divider">
+                <v-divider vertical></v-divider>
               </v-col>
             </v-row>
           </v-col>
           <v-col
             cols="12"
             :md="current_group_index ? 12 : 4"
-            :class="current_group_index ? 'champzKnockout' : 'champzMatches'"
+            :class="current_group_index ? 'champz-knockout' : 'champz-matches'"
           >
-            <h5 class="text-center mt-3">{{ selected_group.name }}</h5>
             <v-simple-table :class="current_group_index ? 'mx-8' : 'mr-0'">
               <template v-slot:default>
                 <thead class="thead-dark">
                   <tr>
-                    <th class="champzFont" scope="col">Match</th>
-                    <th class="champzFont" scope="col">Action</th>
+                    <th class="champz-font" scope="col">Match</th>
+                    <th class="champz-font" scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(match, i) in selected_group.matches" :key="i">
                     <td
-                      class="champzFont text-center"
+                      class="champz-font text-center"
                       v-if="
                         match.goals_participant_1 == null &&
                         match.goals_participant_2 == null
                       "
                     >
-                      {{ match.participant_1.name.toUpperCase() }}
+                      {{ match.participant_1.name.slice(0,3).toUpperCase() }}
 
                       <img
                         style="width: 30px"
@@ -122,10 +118,10 @@
                           )
                         "
                       />
-                      {{ match.participant_2.name.toUpperCase() }}
+                      {{ match.participant_2.name.slice(0,3).toUpperCase() }}
                     </td>
-                    <td class="champzFont text-center" v-else>
-                      {{ match.participant_1.name.toUpperCase() }}
+                    <td class="champz-font text-center" v-else>
+                      {{ match.participant_1.name.slice(0,3).toUpperCase() }}
                       <img
                         style="width: 30px"
                         :src="
@@ -144,7 +140,7 @@
                           )
                         "
                       />
-                      {{ match.participant_2.name.toUpperCase() }}
+                      {{ match.participant_2.name.slice(0,3).toUpperCase() }}
                     </td>
                     <td>
                       <v-btn
@@ -170,6 +166,7 @@
             light
             color="primary"
             v-if="final"
+            :loading="champz_file_loading"
             v-on:click="generate_champz_file()"
             >Generate Champz File</v-btn
           >
@@ -209,7 +206,7 @@
           <form v-on:submit.prevent="register_score()">
             <v-row>
               <v-col cols="12" md="3">
-                <span class="champzFont mr-2 mt-1" style="float: right">{{
+                <span class="champz-font mr-2 mt-1" style="float: right">{{
                   current_match.participant_1.name
                 }}</span>
               </v-col>
@@ -224,7 +221,7 @@
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="2">
-                <span class="champzFont ml-7 mt-1">X</span>
+                <span class="champz-font ml-7 mt-1">X</span>
               </v-col>
               <v-col cols="12" md="2">
                 <v-text-field
@@ -237,7 +234,7 @@
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="3">
-                <span class="champzFont ml-3 mt-1" style="float: left">{{
+                <span class="champz-font ml-3 mt-1" style="float: left">{{
                   current_match.participant_2.name
                 }}</span>
               </v-col>
@@ -252,7 +249,10 @@
               <v-btn
                 type="submit"
                 color="green"
-                :disabled="!current_match.goals_participant_2 || !current_match.goals_participant_1"
+                :disabled="
+                  !current_match.goals_participant_2 ||
+                  !current_match.goals_participant_1
+                "
                 :loading="register_score_loading"
                 >Save changes</v-btn
               >
@@ -266,27 +266,24 @@
 </template>
 
 <style lang="scss" scoped>
-// tr {
-//   height: 35px !important;
-// }
-.champzFont {
+.champz-font {
   font-size: 15px;
   font-weight: 500;
   font-family: system-ui;
   vertical-align: inherit !important;
 }
-
 .table {
   height: 61vh;
 }
-
-.champzDivider {
+.champz-divider {
   height: 64vh;
+  display: flex;
+  justify-content: center;
 }
-.champzKnockout {
+.champz-knockout {
   height: 100%;
 }
-.champzMatches {
+.champz-matches {
   height: 100%;
   overflow-y: auto;
 }
@@ -311,6 +308,7 @@ export default {
     loading: true,
     group_loading: false,
     register_score_loading: false,
+    champz_file_loading: false,
     replace: [false, false, false, false],
   }),
   async created() {
@@ -440,10 +438,12 @@ export default {
         .catch((err) => {});
     },
     generate_champz_file: async function () {
+      this.champz_file_loading = true;
       await this.service
         .postRequest("/api/end-champz")
         .then((response) => {})
         .catch((err) => {});
+      this.champz_file_loading = false;
     },
   },
   computed: {},

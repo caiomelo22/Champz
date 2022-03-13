@@ -30,6 +30,7 @@ SECRET_KEY = django_secret_key
 DEBUG = True
 
 ALLOWED_HOSTS = []
+APPEND_SLASH=False
 
 
 # Application definition

@@ -62,4 +62,4 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
     matches = MatchSerializer(read_only = True, many=True)
     class Meta:
         model = models.Group
-        fields = ['id', 'group', 'participants', 'matches']
+        fields = ['id', 'name', 'participants', 'matches']

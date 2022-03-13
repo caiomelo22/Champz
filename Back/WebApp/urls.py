@@ -3,15 +3,15 @@ from rest_framework import routers
 from WebApp import views as WebAppViews
 from WebApp.views import BuyPlayerView, GetFinalView, TransfersView, ChampzPlayersView, GetGroupStageView, EndChampzView, ParticipantsTeamsView, GetWildcardKnockoutRoundView, GetSemiFinalsRoundView, UpdatePlayerDatabaseView, UpdateTeamsLeaguesDatabaseView
 
-router = routers.DefaultRouter()
-router.register(r'nation', WebAppViews.NationViewSet)
-router.register(r'league', WebAppViews.LeagueViewSet)
-router.register(r'participant', WebAppViews.ParticipantViewSet)
-router.register(r'team', WebAppViews.TeamViewSet)
-router.register(r'position', WebAppViews.PositionViewSet)
-router.register(r'player', WebAppViews.PlayerViewSet)
-router.register(r'group', WebAppViews.GroupViewSet)
-router.register(r'match', WebAppViews.MatchViewSet)
+router = routers.DefaultRouter(trailing_slash=False)
+router.register('nation', WebAppViews.NationViewSet)
+router.register('league', WebAppViews.LeagueViewSet)
+router.register('participant', WebAppViews.ParticipantViewSet)
+router.register('team', WebAppViews.TeamViewSet)
+router.register('position', WebAppViews.PositionViewSet)
+router.register('player', WebAppViews.PlayerViewSet)
+router.register('group', WebAppViews.GroupViewSet)
+router.register('match', WebAppViews.MatchViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

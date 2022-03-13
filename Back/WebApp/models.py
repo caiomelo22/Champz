@@ -135,12 +135,13 @@ class Player(models.Model):
 
 class Group(models.Model):
     id = models.AutoField(primary_key=True)
-    group = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     participants = models.ManyToManyField(Participant)
+    previous_stage = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE)
 
     @classmethod
-    def create(cls, group):
-        group = Group.objects.create(group=group)
+    def create(cls, name):
+        group = Group.objects.create(name=name)
         return group
 
     def add_participant(self, participant):
@@ -201,7 +202,6 @@ class Group(models.Model):
                     stats[match.participant_1] = self.set_draw_stats(stats[match.participant_1], match.participant_1)
                     stats[match.participant_2] = self.set_draw_stats(stats[match.participant_2], match.participant_2)
 
-        print(stats)
         stats_list = list(stats.items())
         stats_list = sorted(stats_list, key=lambda x: (x[1]['P'], x[1]['W'], x[1]['GD'], x[1]['GF']), reverse=True)
         return stats_list
@@ -212,7 +212,7 @@ class Group(models.Model):
         file.write('MATCHES: \n\n')
 
         strBuilder = ""
-        strBuilder += '{}\n'.format(self.group.upper())
+        strBuilder += '{}\n'.format(self.name.upper())
         for match in self.matches:
             participant_1 = match.participant_1.name
             participant_2 = match.participant_2.name
@@ -229,7 +229,7 @@ class Group(models.Model):
         file.close()
 
     def __str__(self):
-        return self.group
+        return self.name
 
 
 class Match(models.Model):

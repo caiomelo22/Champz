@@ -564,7 +564,7 @@ export default {
     get_participants: async function () {
       this.participants_loading = true;
       await this.service
-        .getRequest("/api/participant/")
+        .getRequest("/api/participant")
         .then((response) => {
           this.participants = response;
         })
@@ -574,7 +574,7 @@ export default {
     get_positions: async function () {
       this.players_loading = true;
       this.service
-        .getRequest("/api/position/")
+        .getRequest("/api/position")
         .then((response) => {
           this.positions = response;
           this.get_players_by_position_algorithm(response[0].id);
@@ -616,7 +616,7 @@ export default {
     },
     get_leagues: async function () {
       await this.service
-        .getRequest("/api/league/")
+        .getRequest("/api/league")
         .then((response) => {
           this.leagues = response;
         })
@@ -632,7 +632,7 @@ export default {
       if (!this.new_participant.id) {
         this.new_participant.budget = this.generic_budget;
         await this.service
-          .postRequest("/api/participant/", this.new_participant)
+          .postRequest("/api/participant", this.new_participant)
           .then((response) => {
             this.participants.push(response);
             this.new_participant.name = null;
@@ -666,7 +666,7 @@ export default {
       this.updating_participant = false;
     },
     delete_participant: async function (id) {
-      var url = "/api/participant/" + id + "/";
+      var url = `/api/participant/${id}`;
       var index = this.participants.map((x) => x.id).indexOf(id);
       this.participants.splice(index, 1);
       await this.service
@@ -721,7 +721,7 @@ export default {
       this.updating_player = true;
       var player = JSON.parse(JSON.stringify(this.current_player));
       player.team_participant = this.current_player.team_participant.id;
-      var url = "/api/buy/" + this.current_player.id;
+      var url = `/api/buy/${this.current_player.id}`;
       await this.service
         .postRequest(url, player)
         .then((response) => {
@@ -735,21 +735,21 @@ export default {
       this.updating_player = false;
     },
     generate_transfers_file: async function () {
-      var url = "/api/transfers/";
+      var url = "/api/transfers";
       await this.service
         .postRequest(url)
         .then((response) => {})
         .catch((err) => {});
     },
     generate_teams_file: async function () {
-      var url = "/api/participants_teams/";
+      var url = "/api/participants_teams";
       await this.service
         .postRequest(url)
         .then((response) => {})
         .catch((err) => {});
     },
     generate_players_file: async function () {
-      var url = "/api/champz_players/";
+      var url = "/api/champz_players";
       await this.service
         .postRequest(url)
         .then((response) => {})

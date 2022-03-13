@@ -27,7 +27,7 @@
             <v-row>
               <v-col cols="12" md="11">
                 <div v-for="(table, index) in tables" :key="index">
-                  <h4 class="text-center my-6">{{ groups[index].group }}</h4>
+                  <h4 class="text-center my-6">{{ groups[index].name }}</h4>
                   <table class="table table-striped ml-7">
                     <!-- <template v-slot:default> -->
                     <thead>
@@ -82,7 +82,7 @@
               :key="group.id"
               class="mt-3"
             >
-              <h5 class="text-center">{{ group.group }}</h5>
+              <h5 class="text-center">{{ group.name }}</h5>
               <v-simple-table :class="current_group_index ? 'mx-8' : 'mr-0'">
                 <template v-slot:default>
                   <thead class="thead-dark">
@@ -191,7 +191,7 @@
           </v-card-title>
           <v-card-text>
             <v-card-actions class="text-center">
-              <v-btn class="mx-auto" color="red" @click="initialize_group()"
+              <v-btn class="mx-auto" color="red" @click="get_group()"
                 >Reset</v-btn
               >
             </v-card-actions>
@@ -319,18 +319,18 @@ export default {
     current_group: {},
   }),
   async created () {
-    await this.get_groups();
+    await this.get_group_stage(false);
   },
   methods: {
     get_dashboard_matches() {
       if (this.current_group_index == 0) {
-        return this.groups.filter((x) => x.group.includes("Group"));
+        return this.groups.filter((x) => x.name.includes("Group"));
       } else if (this.current_group_index == 1) {
-        return this.groups.filter((x) => x.group.includes("Wildcard"));
+        return this.groups.filter((x) => x.name.includes("Wildcard"));
       } else if (this.current_group_index == 2) {
-        return this.groups.filter((x) => x.group.includes("Semi"));
+        return this.groups.filter((x) => x.name.includes("Semi"));
       } else if (this.current_group_index == 3) {
-        return this.groups.filter((x) => x.group.includes("Final"));
+        return this.groups.filter((x) => x.name.includes("Final"));
       }
     },
     async next_stage_click() {
@@ -360,35 +360,8 @@ export default {
         })
         .catch((err) => {});
     },
-    get_groups: async function () {
-      this.loading = true;
-      await this.service
-        .getRequest("/api/group/")
-        .then((response) => {
-          this.groups = response;
-          if (this.groups.length == 0) {
-            this.initialize_group();
-          } else {
-            this.get_groups_table();
-          }
-        })
-        .catch((err) => {
-          this.loading = false;
-        });
-    },
-    initialize_group: async function () {
-      this.loading = true;
-      await this.service
-        .postRequest("/api/start-champz/")
-        .then((response) => {
-          this.reset_confirmation_dialog = false;
-        })
-        .catch((err) => {
-          this.loading = false;
-        });
-    },
     knockout_stage_btn_click: async function () {
-      if (this.groups.filter((x) => x.group.includes("Wildcard")).length > 1) {
+      if (this.groups.filter((x) => x.name.includes("Wildcard")).length > 1) {
         this.current_group_index += 1;
       } else {
         this.loading = true;
@@ -409,12 +382,12 @@ export default {
     next_knockout_stage_btn_click: async function () {
       if (
         this.current_group_index == 1 &&
-        this.groups.filter((x) => x.group.includes("Semi")).length == 0
+        this.groups.filter((x) => x.name.includes("Semi")).length == 0
       ) {
         await this.generate_semis();
       } else if (
         this.current_group_index == 2 &&
-        this.groups.filter((x) => x.group.includes("Final")).length == 0
+        this.groups.filter((x) => x.name.includes("Final")).length == 0
       ) {
         await this.generate_final();
       } else {
@@ -423,6 +396,17 @@ export default {
       if (this.current_group_index == 3) {
         this.final = true;
       }
+    },
+    get_group_stage: async function (replace) {
+      this.loading = true;
+      await this.service
+        .postRequest(`/api/group-stage`, {replace: replace})
+        .then((response) => {
+          this.groups.push(response);
+        })
+        .catch((err) => {
+          this.loading = false;
+        });
     },
     generate_wildcard: async function () {
       this.loading = true;

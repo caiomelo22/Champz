@@ -261,13 +261,12 @@ class BuyPlayerView(APIView):
 
 class GetGroupStageView(APIView):
     def post(self, request):
-        data = dict(request.data)
-        groups = Group.objects.all()
-        if len(groups) > 0 and not data['replace']:
-            return Response(GroupSerializer(groups[0]).data)
-        elif len(groups) > 0:
-            for group in groups:
-                group.delete()
+        replace = request.data['replace']
+        group = Group.objects.filter(name='Group 1')
+        if len(group) > 0 and not replace:
+            return Response(GroupSerializer(group[0]).data)
+        elif len(group) > 0:
+            group[0].delete()
         
         participants = Participant.objects.all()
         group = Group.create('Group 1')
@@ -282,21 +281,22 @@ class GetGroupStageView(APIView):
 
 class GetWildcardKnockoutRoundView(APIView):
     def post(self, request):
-        data = dict(request.data)
+        replace = request.data['replace']
         matches_wildcard = []
 
-        old_stage = Group.objects.filter(group='Wildcard')
-        if len(old_stage) > 0 and not data['replace']:
+        old_stage = Group.objects.filter(name='Wildcard')
+        if len(old_stage) > 0 and not replace:
             return Response(GroupSerializer(old_stage[0]).data)
         elif len(old_stage) > 0:
             old_stage = old_stage[0]
             old_stage.delete()
 
-        groups = list(Group.objects.filter(group='Group 1'))
+        groups = list(Group.objects.filter(name='Group 1'))
 
         if len(groups) == 1:
             table_wildcard = groups[0].get_group_table()[2:6]
             wildcard = Group.create('Wildcard')
+            wildcard.previous_stage = groups[0]
 
             for participant in table_wildcard:
                 wildcard.add_participant(participant[0])
@@ -342,11 +342,11 @@ class GetSemiFinalsRoundView(APIView):
         return qualified
 
     def post(self, request):
-        data = dict(request.data)
+        replace = request.data['replace']
         matches_semis = []
 
-        old_stage = Group.objects.filter(group='Semis')
-        if len(old_stage) > 0 and not data['replace']:
+        old_stage = Group.objects.filter(name='Semis')
+        if len(old_stage) > 0 and not replace:
             return Response(GroupSerializer(old_stage[0]).data)
         elif len(old_stage) > 0:
             old_stage = old_stage[0]
@@ -364,6 +364,7 @@ class GetSemiFinalsRoundView(APIView):
             return HttpResponseNotFound("Wildcard stage not found")
         table_wildcard = wildcard_stage.get_group_table()
         semis = Group.create('Semis')
+        semis.previous_stage = wildcard_stage
 
         wildcard_winners = self.get_group_winners('Wildcard', table_wildcard, table_group_stage)
 
@@ -401,10 +402,10 @@ class GetFinalView(APIView):
         return -1
         
     def post(self, request):
-        data = dict(request.data)
+        replace = request.data['replace']
         
-        old_stage = Group.objects.filter(group='Final')
-        if len(old_stage) > 0 and not data['replace']:
+        old_stage = Group.objects.filter(name='Final')
+        if len(old_stage) > 0 and not replace:
             return Response(GroupSerializer(old_stage[0]).data)
         elif len(old_stage) > 0:
             old_stage = old_stage[0]
@@ -421,6 +422,7 @@ class GetFinalView(APIView):
         matches = []
             
         final = Group.create('Final')
+        final.previous_stage = semis
 
         for participant in qualified:
             final.add_participant(participant)
@@ -519,7 +521,7 @@ class EndChampzView(APIView):
             file.write(strBuilder)
 
         groups = list(Group.objects.all())
-        group_stage = [g for g in groups if 'Group' in g.group]
+        group_stage = [g for g in groups if 'Group' in g.name]
 
         for index, group in enumerate(group_stage):
             table = group.get_group_table()
@@ -539,7 +541,7 @@ class EndChampzView(APIView):
 
         for group in groups:
             strBuilder = ""
-            strBuilder += '{}\n'.format(group.group.upper())
+            strBuilder += '{}\n'.format(group.name.upper())
             matches = Match.objects.filter(group=group)
             for match in matches:
                 participant_1 = match.participant_1.participant.name

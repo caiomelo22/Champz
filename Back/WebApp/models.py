@@ -206,31 +206,6 @@ class Group(models.Model):
         stats_list = sorted(stats_list, key=lambda x: (x[1]['P'], x[1]['W'], x[1]['GD'], x[1]['GF']), reverse=True)
         return stats_list
 
-    def generate_final_round(self):
-        participants = self.get_group_table()
-        qualified = list()
-
-        qualified.append(participants[0][0])
-        qualified.append(participants[1][0])
-
-        matches = []
-
-        old_stage = Group.objects.filter(group='Final')
-        if len(old_stage) > 0:
-            old_stage = old_stage[0]
-            old_stage.delete()
-            
-        final = Group.create('Final')
-
-        for participant in qualified:
-            final.add_participant(participant)
-
-        matches.append(Match.create(final, qualified[0], qualified[1]))
-
-        final.save()
-
-        return matches
-
     def export_matches(self):
         file = open("matches.txt", "w")
 

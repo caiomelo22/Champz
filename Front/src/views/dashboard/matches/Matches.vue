@@ -86,7 +86,7 @@
               <template v-slot:default>
                 <thead class="thead-dark">
                   <tr>
-                    <th class="champz-font" scope="col">Match</th>
+                    <th class="champz-font text-center" scope="col">Match</th>
                     <th class="champz-font" scope="col">Action</th>
                   </tr>
                 </thead>

@@ -35,8 +35,6 @@
       expand
       nav
     >
-      <!-- Style cascading bug  -->
-      <!-- https://github.com/vuetifyjs/vuetify/pull/8574 -->
       <div />
 
       <template v-for="(item, i) in computedItems">
@@ -45,7 +43,6 @@
           :key="`group-${i}`"
           :item="item"
         >
-          <!--  -->
         </base-item-group>
 
         <base-item
@@ -55,9 +52,6 @@
           :item="item"
         />
       </template>
-
-      <!-- Style cascading bug  -->
-      <!-- https://github.com/vuetifyjs/vuetify/pull/8574 -->
       <div />
     </v-list>
   </v-navigation-drawer>
@@ -106,27 +100,6 @@
       },
       computedItems () {
         return this.items.map(this.mapItem)
-      },
-      profile () {
-        return {
-          avatar: true,
-          group: '',
-          title: this.$t('avatar'),
-          children: [
-            {
-              href: '',
-              title: this.$t('my-profile'),
-            },
-            {
-              to: '',
-              title: this.$t('edit-profile'),
-            },
-            {
-              to: '',
-              title: this.$t('settings'),
-            },
-          ],
-        }
       },
     },
 

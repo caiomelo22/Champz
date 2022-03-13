@@ -231,6 +231,14 @@ class MatchViewSet(viewsets.ModelViewSet):
         match = MatchSerializer(match, context={'request': request})
         return Response(match.data)
 
+    def partial_update(self, request, *args, **kwargs):
+        data = dict(request.data)
+        instance = self.queryset.get(id=data['id'])
+        instance.goals_participant_1 = data['goals_participant_1']
+        instance.goals_participant_2 = data['goals_participant_2']
+        instance.save()
+        return Response(MatchSerializer(instance).data)
+
 
 class BuyPlayerView(APIView):
     def post(self, request, id):
@@ -259,11 +267,26 @@ class BuyPlayerView(APIView):
         else:
             return HttpResponseBadRequest("The budget of {} is not enough to buy {}".format(data['team_participant'], player))
 
+class GetGroupTableView(APIView):
+    def get(self, request, id):
+        group = Group.objects.filter(id=id)
+        if len(group) == 0:
+            return HttpResponseNotFound("There are no groups with the given id.")
+        else:
+            group = group[0]
+
+        table = group.get_group_table()
+        new_table = []
+
+        [new_table.append((ParticipantSerializer(p[0]).data, p[1])) for p in table]
+        return JsonResponse(new_table, safe=False)
+
 class GetGroupStageView(APIView):
     def post(self, request):
         replace = request.data['replace']
         group = Group.objects.filter(name='Group 1')
         if len(group) > 0 and not replace:
+            group[0].matches = list(Match.objects.filter(group=group[0]))
             return Response(GroupSerializer(group[0]).data)
         elif len(group) > 0:
             group[0].delete()
@@ -286,6 +309,7 @@ class GetWildcardKnockoutRoundView(APIView):
 
         old_stage = Group.objects.filter(name='Wildcard')
         if len(old_stage) > 0 and not replace:
+            old_stage[0].matches = list(Match.objects.filter(group=old_stage[0]))
             return Response(GroupSerializer(old_stage[0]).data)
         elif len(old_stage) > 0:
             old_stage = old_stage[0]
@@ -323,7 +347,7 @@ class GetSemiFinalsRoundView(APIView):
     def get_group_winners(self, group, participants, group_stage):
         qualified = []
         try:
-            group = Group.objects.get(group=group)
+            group = Group.objects.get(name=group)
         except:
             return HttpResponseNotFound("Group not found")
         for participant in participants:
@@ -347,19 +371,20 @@ class GetSemiFinalsRoundView(APIView):
 
         old_stage = Group.objects.filter(name='Semis')
         if len(old_stage) > 0 and not replace:
+            old_stage[0].matches = list(Match.objects.filter(group=old_stage[0]))
             return Response(GroupSerializer(old_stage[0]).data)
         elif len(old_stage) > 0:
             old_stage = old_stage[0]
             old_stage.delete()
 
         try:
-            group_stage = Group.objects.get(group='Group 1')
+            group_stage = Group.objects.get(name='Group 1')
         except:
             return HttpResponseNotFound("Group stage not found")
         table_group_stage = group_stage.get_group_table()
  
         try:
-            wildcard_stage = Group.objects.get(group='Wildcard')
+            wildcard_stage = Group.objects.get(name='Wildcard')
         except:
             return HttpResponseNotFound("Wildcard stage not found")
         table_wildcard = wildcard_stage.get_group_table()
@@ -406,12 +431,13 @@ class GetFinalView(APIView):
         
         old_stage = Group.objects.filter(name='Final')
         if len(old_stage) > 0 and not replace:
+            old_stage[0].matches = list(Match.objects.filter(group=old_stage[0]))
             return Response(GroupSerializer(old_stage[0]).data)
         elif len(old_stage) > 0:
             old_stage = old_stage[0]
             old_stage.delete()
 
-        semis = Group.objects.get(group='Semis')
+        semis = Group.objects.get(name='Semis')
 
         participants = semis.get_group_table()
         qualified = list()
@@ -544,8 +570,8 @@ class EndChampzView(APIView):
             strBuilder += '{}\n'.format(group.name.upper())
             matches = Match.objects.filter(group=group)
             for match in matches:
-                participant_1 = match.participant_1.participant.name
-                participant_2 = match.participant_2.participant.name
+                participant_1 = match.participant_1.name
+                participant_2 = match.participant_2.name
                 goals_1 = match.goals_participant_1
                 if goals_1 is None:
                     goals_1 = ''

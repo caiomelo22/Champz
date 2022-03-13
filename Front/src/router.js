@@ -13,7 +13,8 @@ const router = new Router({
   mode: "history",
   routes: [
     {
-      path: "/draft",
+      path: "/",
+      redirect: "/draft",
       ...Draft,
     },
     {
